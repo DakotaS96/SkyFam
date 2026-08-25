@@ -1,6 +1,6 @@
 # SkyFam
 
-A free, self-hosted family dashboard for messaging, photo slideshows, weather updates, radio, and games.
+A free, self-hosted family dashboard for messaging, photo slideshows, weather awareness, and simple games.
 
 ## Status
 
@@ -12,38 +12,49 @@ The project is designed to run on a user's own home server, with an emphasis on 
 
 - Family messaging with photo and video attachments
 - Photo slideshow for shared family pictures
+- Interactive weather radar
 - Weather-focused dashboard content
-- Embedded weather video
-- Internet radio player with administrator-managed stations
+- Embedded weather video through YouTube
 - Simple built-in games
 - Self-hosted storage and configuration
 
+## Weather Radar
+
+SkyFam includes an interactive weather radar designed to make local, regional, and national weather conditions easy to view from the dashboard.
+
+Users can select a location from the available city list or enter a U.S. ZIP code to center the radar on a specific area.
+
+Radar imagery is provided by external weather-data services and remains subject to the availability and terms of those providers.
+
+SkyFam is not an official weather-warning or emergency-alert service. For severe weather decisions and official warnings, users should rely on the National Weather Service, local emergency management, and other appropriate official sources.
+
 ## Weather Video
 
-SkyFam can display weather-focused YouTube content using YouTube's embedded player.
+SkyFam can display weather-focused YouTube content using YouTube's official embedded player.
 
-Video remains hosted and delivered by YouTube. SkyFam does not download, record, restream, or redistribute video content.
+The default development setup has been tested with content from Y'allBot and Ryan Hall, Y'all, whose public YouTube channels provide weather-related video and live coverage.
 
-The weather video source can be configured by the SkyFam administrator. Optional live-channel detection is also being developed so SkyFam can automatically switch to a configured weather channel when that channel is live.
+All video remains hosted and delivered by YouTube. SkyFam does not download, record, restream, or redistribute video content.
 
-The public SkyFam project is not affiliated with or endorsed by any YouTube creator or weather-media provider unless specifically stated.
-
-## Radio
-
-SkyFam includes an optional internet radio player.
-
-Radio stations are managed by the administrator of each SkyFam installation. SkyFam does not operate or relay a centralized radio streaming service. When a station is played, the user's browser connects directly to the configured stream provider.
-
-The public SkyFam project does not currently include any preconfigured third-party radio stations.
-
-Support for optional NOAA Weather Radio streams is being explored, subject to permission and any usage or attribution requirements from the stream provider.
+SkyFam is not affiliated with or endorsed by Y'allBot, Ryan Hall, Y'all, YouTube, or any other third-party creator or weather-media provider unless specifically stated.
 
 ## Screenshot
 
-![SkyFam dashboard](SkyFam2.png)
+[SkyFam dashboard](https://github.com/DakotaS96/SkyFam/blob/main/SkyFam2.png)
 
-*SkyFam dashboard showing weather, family messaging, photo slideshow, and internet radio features.*
+*SkyFam dashboard showing weather radar, family messaging, photo slideshow, weather video, and built-in games.*
 
 ## Development
 
 More information, installation instructions, configuration options, and licensing details will be added as development continues.
+
+## Credits
+
+SkyFam may be configured to display weather-related YouTube content from third-party creators.
+
+Development and testing have included content from:
+- Y'allBot
+- Ryan Hall, Y'all
+
+All trademarks, channel names, video content, and related branding remain the property of their respective owners.
+
