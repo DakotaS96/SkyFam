@@ -40,7 +40,7 @@ SkyFam is not affiliated with or endorsed by Y'allBot, Ryan Hall, Y'all, YouTube
 
 ## Screenshot
 
-[SkyFam dashboard](https://github.com/DakotaS96/SkyFam/blob/main/SkyFam3.png)
+![SkyFam dashboard](SkyFam3.png)
 
 *SkyFam dashboard showing weather radar, family messaging, photo slideshow, weather video, and built-in games.*
 
