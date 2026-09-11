@@ -1,0 +1,3658 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Dashboard</title>
+<style>
+body {
+    margin: 0;
+    overflow: hidden;
+    background: black;
+}
+
+.grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: 1fr 1fr;
+    height: 100vh;
+    gap: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+.panel {
+    border: 3px solid #66ff99;
+    border-radius: 10px;
+    box-sizing: border-box;
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 0 10px rgba(102,255,153,0.35);
+    display: flex;
+    flex-direction: column;
+}
+
+/* Panel Header */
+.panel-header {
+    padding: 8px 12px;
+    background: #1a1a1a;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    border-bottom: 2px solid #333;
+    flex-shrink: 0;
+}
+
+.panel-header strong {
+    flex: 1;
+    color: #66ff99;
+}
+
+.panel-header button {
+    padding: 6px 14px;
+    font-size: 15px;
+    border: none;
+    border-radius: 6px;
+    background: #2d8cff;
+    color: white;
+    cursor: pointer;
+}
+
+/* Slideshow */
+#slide-container {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    background: black;
+    flex: 1;
+}
+
+#slide-bg {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    filter: blur(25px) brightness(0.5);
+    transform: scale(1.1);
+}
+
+#slide-foreground {
+    position: relative;
+    z-index: 2;
+    width: 100%;
+    height: 100%;
+    display: flex;
+}
+
+#slide-main, #slide-fill {
+    display: block;
+    height: 100%;
+}
+
+#slide-main { object-fit: cover; }
+#slide-fill { flex: 1; object-fit: cover; }
+
+/* Radio & YallBot */
+.radio-frame, .stream-frame {
+    width: 100%;
+    height: 100%;
+    border: none;
+    flex: 1;
+}
+
+.chat-frame {
+    width: 100%;
+    height: 100%;
+    border: none;
+}
+
+#mediaOverlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.94);
+    z-index: 99999;
+
+    align-items: center;
+    justify-content: center;
+}
+
+#mediaOverlay img {
+    max-width: 96vw;
+    max-height: 96vh;
+    border-radius: 12px;
+}
+
+#closeMedia {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+
+    background: red;
+    color: white;
+
+    border: none;
+    border-radius: 10px;
+
+    padding: 12px 16px;
+
+    font-size: 22px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+#gameBar {
+
+    position: absolute;
+
+    bottom: 10px;
+
+    left: 50%;
+
+    transform: translateX(-50%);
+
+    display: flex;
+
+    justify-content: center;
+
+    gap: 10px;
+
+    padding: 8px;
+
+    background: rgba(0,0,0,0.75);
+
+    z-index: 500;
+
+    opacity: 0;
+
+    pointer-events: none;
+
+    transition: opacity 0.3s ease;
+
+}
+
+#gameBar.visible {
+
+    opacity: 1;
+
+    pointer-events: auto;
+
+}
+
+#gameBar button {
+
+    font-size: 24px;
+
+    padding: 8px 12px;
+
+    border-radius: 8px;
+
+    cursor: pointer;
+}
+
+
+/* Mobile/tablet navigation button */
+#touchNavButton {
+    display: none;
+}
+
+@media (pointer: coarse) {
+    #touchNavButton {
+        display: block;
+        position: fixed;
+        right: 8px;
+        bottom: 8px;
+        width: 46px;
+        height: 46px;
+        padding: 0;
+        border: none;
+        border-radius: 12px;
+        background: rgba(0,0,0,0.82);
+        color: white;
+        font-size: 26px;
+        font-weight: bold;
+        line-height: 46px;
+        text-align: center;
+        z-index: 200001;
+        cursor: pointer;
+        touch-action: manipulation;
+    }
+
+    #gameBar {
+        position: fixed;
+        bottom: 62px;
+        left: 50%;
+        transform: translateX(-50%);
+        max-width: calc(100vw - 20px);
+        flex-wrap: wrap;
+        z-index: 200000;
+    }
+}
+
+#uploadToast {
+    position: absolute;
+
+    top: 50%;
+    left: 50%;
+
+    transform:
+        translate(-50%, -50%);
+
+    background: rgba(
+        0,
+        0,
+        0,
+        0.85
+    );
+
+    color: white;
+
+    padding: 16px 24px;
+
+    border-radius: 12px;
+
+    font-size: 22px;
+
+    opacity: 0;
+
+    transition:
+        opacity 0.3s ease;
+
+    pointer-events: none;
+
+    z-index: 9999;
+}
+
+#ryanAlert {
+
+    display: none;
+
+    margin-left: auto;
+
+    color: red;
+
+    font-weight: bold;
+
+    cursor: pointer;
+
+    animation:
+        ryanBlink 2s infinite;
+
+}
+
+@keyframes ryanBlink {
+
+    50% {
+        opacity: 0;
+    }
+
+}
+
+
+
+#youtubePanel.ryanFullscreen {
+
+    position: fixed;
+    inset: 0;
+
+    width: 100vw;
+    height: 100vh;
+
+    z-index: 99999;
+
+    background: black;
+
+}
+
+#featuredAlert {
+    display: none;
+    color: #ffffff;
+    font-weight: bold;
+    cursor: pointer;
+    text-shadow: 1px 1px 3px rgba(0,0,0,.8);
+}
+
+
+/* Ryan Hall live header controls */
+
+#ryanAlert {
+    display: none;
+    cursor: pointer;
+    line-height: 1.05;
+}
+
+.ryan-live-title,
+.ryan-live-hint {
+    display: block;
+}
+
+.ryan-live-hint {
+    margin-top: 2px;
+    font-size: 0.68em;
+    font-weight: normal;
+    opacity: 0.8;
+    text-align: center;
+}
+
+#ryanControls {
+    margin-left: auto;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.ryan-control {
+    position: static;
+    z-index: auto;
+    background: #2d8cff;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    padding: 4px 8px;
+    font-size: 12px;
+    cursor: pointer;
+    white-space: nowrap;
+}
+
+.ryan-control.close {
+    background: #e32626;
+}
+
+#youtubePanel.ryanFullscreen .panel-header {
+    z-index: 100002;
+}
+
+@media (max-width: 700px) {
+    .ryan-control {
+        padding: 8px 12px;
+        font-size: 14px;
+        min-height: 44px;
+    }
+
+    .ryan-live-hint {
+        font-size: 0.6em;
+    }
+}
+
+/*
+ * Touchscreen/tablet controls
+ *
+ * Touch devices do not have mouse movement available to reveal the
+ * dashboard game/navigation bar, so keep it visible.
+ */
+@media (hover: none), (pointer: coarse) {
+    #gameBar {
+        opacity: 1 !important;
+        pointer-events: auto !important;
+
+        bottom: max(10px, env(safe-area-inset-bottom));
+
+        max-width: calc(100vw - 20px);
+        box-sizing: border-box;
+
+        overflow-x: auto;
+        overflow-y: hidden;
+
+        -webkit-overflow-scrolling: touch;
+    }
+
+    #gameBar button {
+        min-width: 44px;
+        min-height: 44px;
+        flex-shrink: 0;
+    }
+
+    #closeMedia {
+        top: max(12px, env(safe-area-inset-top));
+        right: max(12px, env(safe-area-inset-right));
+
+        min-width: 88px;
+        min-height: 48px;
+
+        padding: 10px 14px;
+
+        font-size: 18px;
+
+        z-index: 100001;
+        touch-action: manipulation;
+    }
+
+    .ryan-control.close {
+        min-width: 80px;
+        min-height: 44px;
+        padding: 8px 12px;
+        font-size: 14px;
+        touch-action: manipulation;
+    }
+}
+
+
+/* ==================== SkyFam YouTube API Admin ==================== */
+
+#yallbotAdminHold {
+    position: relative;
+    user-select: none;
+    -webkit-user-select: none;
+    touch-action: manipulation;
+}
+
+#yallbotAdminHold::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    bottom: -4px;
+    width: 0;
+    height: 2px;
+    background: currentColor;
+}
+
+#yallbotAdminHold.admin-holding::after {
+    width: 100%;
+    transition: width 2s linear 1s;
+}
+
+.youtube-api-modal {
+    display: none;
+    position: fixed;
+    inset: 0;
+    z-index: 200000;
+    background: rgba(0, 0, 0, 0.72);
+    align-items: center;
+    justify-content: center;
+}
+
+.youtube-api-box {
+    width: min(520px, calc(100vw - 40px));
+    background: #f7f7f7;
+    color: #171717;
+    border: 2px solid #ffffff;
+    border-radius: 12px;
+    padding: 24px;
+    box-sizing: border-box;
+    box-shadow: 0 10px 36px rgba(0, 0, 0, .55);
+}
+
+.youtube-api-box h2 {
+    margin-top: 0;
+}
+
+.youtube-api-box p {
+    line-height: 1.4;
+}
+
+.youtube-api-note {
+    color: #555555;
+}
+
+.youtube-api-box label {
+    display: block;
+    margin-top: 14px;
+    margin-bottom: 5px;
+    font-weight: bold;
+}
+
+.youtube-api-box input {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 11px;
+    font-size: 16px;
+    background: #ffffff;
+    color: #111111;
+    border: 1px solid #888888;
+    border-radius: 6px;
+}
+
+.youtube-api-buttons {
+    display: flex;
+    gap: 8px;
+    margin-top: 18px;
+    flex-wrap: wrap;
+}
+
+.youtube-api-buttons button {
+    padding: 10px 16px;
+    cursor: pointer;
+    border: 1px solid #777777;
+    border-radius: 6px;
+    background: #ffffff;
+    color: #111111;
+    font-weight: bold;
+}
+
+.youtube-api-result,
+.youtube-api-status {
+    margin-top: 12px;
+    min-height: 20px;
+    color: #222222;
+    font-weight: 600;
+}
+
+#youtubeApiTest,
+#youtubeApiSave {
+    background: #2d6cdf;
+    color: #ffffff;
+    border-color: #2459b8;
+}
+
+#youtubeApiCancel {
+    background: #e6e6e6;
+    color: #111111;
+}
+
+
+</style>
+</head>
+
+<body>
+
+<div class="grid">
+
+<!-- 1: Photos -->
+<div class="panel" id="slideshow">
+
+    <div id="gameBar">
+
+        <button id="photoButton" onclick="showPhotos()">
+            📸
+        </button>
+
+        <button onclick="showSolitaire()">
+             A♠
+        </button>
+
+        <button onclick="showMahjong()">
+    🀄
+</button>
+
+<button onclick="showPuzzle()">
+    🧩
+</button>
+
+<button onclick="showBubbleShooter()">
+    🫧
+</button>
+
+    </div>
+
+    <div id="slide-container">
+        <img id="slide-bg">
+
+        <div id="slide-foreground">
+            <img id="slide-main">
+            <img id="slide-fill">
+        </div>
+    </div>
+
+    <iframe
+        id="gameFrame"
+        style="
+            display:none;
+            width:100%;
+            height:100%;
+            border:none;
+        ">
+    </iframe>
+
+<div id="uploadToast"></div>
+
+</div>
+
+<!-- 2: YallBot -->
+<div class="panel" id="youtubePanel">
+
+    <div class="panel-header">
+
+        <strong id="yallbotAdminHold">
+            🖥 YallBot Live
+        </strong>
+
+        <span id="ryanAlert">
+            <span class="ryan-live-title">🔴 Ryan Hall is Live</span>
+            <span class="ryan-live-hint">(Click here to watch)</span>
+        </span>
+
+        <span id="featuredAlert"
+              style="display:none;">
+            📺 Featured Video
+        </span>
+
+        <div id="ryanControls">
+
+            <button id="closeRyan"
+                    class="ryan-control close"
+                    style="display:none;">
+                ✖ Close
+            </button>
+
+            <button id="fullscreenRyan"
+                    class="ryan-control"
+                    style="display:none;">
+                ⛶ Fullscreen
+            </button>
+
+            <button id="returnRyan"
+                    class="ryan-control"
+                    style="display:none;">
+                ← Return
+            </button>
+
+        </div>
+
+    </div>
+
+<div id="videoFrame"
+     style="
+         width:100%;
+         height:calc(100% - 48px);
+         border:none;
+     ">
+</div>
+
+</div>
+
+<div id="youtubeApiModal"
+     class="youtube-api-modal">
+
+    <div class="youtube-api-box">
+
+        <h2>SkyFam Admin</h2>
+
+        <div class="youtube-api-buttons"
+             style="margin-top:0; margin-bottom:18px;">
+
+            <button
+                type="button"
+                id="youtubeAdminApiTab">
+                API Settings
+            </button>
+
+            <button
+                type="button"
+                id="youtubeAdminLiveTab">
+                Live Event
+            </button>
+
+            <button
+                type="button"
+                id="youtubeAdminPasswordTab">
+                Password
+            </button>
+
+        </div>
+
+        <div id="youtubeApiSection">
+
+        <h3>YouTube Data API Key</h3>
+
+        <p>
+            Used by SkyFam to automatically detect
+            when Ryan Hall is live and load his
+            current YouTube livestream.
+        </p>
+
+        <p class="youtube-api-note">
+            The key is stored only on this
+            SkyFam server.
+        </p>
+
+        <div id="youtubeApiCurrentStatus"
+             class="youtube-api-status">
+        </div>
+
+        <label for="youtubeApiKey">
+            YouTube Data API v3 Key
+        </label>
+
+        <input
+            id="youtubeApiKey"
+            type="password"
+            autocomplete="off"
+            placeholder="Paste your YouTube Data API v3 key here">
+
+        <label for="youtubeApiPassword">
+            SkyFam Admin Password
+        </label>
+
+        <input
+            id="youtubeApiPassword"
+            type="password"
+            autocomplete="current-password"
+            placeholder="Enter the SkyFam admin password">
+
+        <div id="youtubeApiResult"
+             class="youtube-api-result">
+        </div>
+
+        <div class="youtube-api-buttons">
+
+            <button
+                type="button"
+                id="youtubeApiTest">
+                Test Key
+            </button>
+
+            <button
+                type="button"
+                id="youtubeApiSave">
+                Save
+            </button>
+
+            <button
+                type="button"
+                id="youtubeApiCancel">
+                Cancel
+            </button>
+
+        </div>
+
+        </div>
+
+        <div id="youtubeLiveSection"
+             style="display:none;">
+
+            <h3>Live YouTube Event</h3>
+
+            <p>
+                Temporarily play a YouTube livestream or
+                event in the YallBot window.
+            </p>
+
+            <p class="youtube-api-note">
+                A manual event overrides automatic live
+                detection until the event is stopped.
+            </p>
+
+            <div id="liveEventCurrentStatus"
+                 class="youtube-api-status">
+            </div>
+
+            <label for="liveEventUrl">
+                YouTube Live/Event URL
+            </label>
+
+            <input
+                id="liveEventUrl"
+                type="url"
+                autocomplete="off"
+                placeholder="https://www.youtube.com/watch?v=...">
+
+            <label for="liveEventTitle">
+                Event Title (optional)
+            </label>
+
+            <input
+                id="liveEventTitle"
+                type="text"
+                autocomplete="off"
+                placeholder="Example: Family Graduation">
+
+            <label for="liveEventPassword">
+                SkyFam Admin Password
+            </label>
+
+            <input
+                id="liveEventPassword"
+                type="password"
+                autocomplete="current-password"
+                placeholder="Enter the SkyFam admin password">
+
+            <div id="liveEventResult"
+                 class="youtube-api-result">
+            </div>
+
+            <div class="youtube-api-buttons">
+
+                <button
+                    type="button"
+                    id="liveEventStart">
+                    Start Event
+                </button>
+
+                <button
+                    type="button"
+                    id="liveEventStop">
+                    Stop Event
+                </button>
+
+                <button
+                    type="button"
+                    id="liveEventBack">
+                    API Settings
+                </button>
+
+            </div>
+
+        </div>
+
+        <div id="youtubePasswordSection"
+             style="display:none;">
+
+            <h3>Change Admin Password</h3>
+
+            <p>
+                Change the password used for SkyFam
+                administrative functions.
+            </p>
+
+            <p class="youtube-api-note">
+                This does not change the Linux root password.
+            </p>
+
+            <label for="adminCurrentPassword">
+                Current Admin Password
+            </label>
+
+            <input
+                id="adminCurrentPassword"
+                type="password"
+                autocomplete="current-password"
+                placeholder="Enter current admin password">
+
+            <label for="adminNewPassword">
+                New Admin Password
+            </label>
+
+            <input
+                id="adminNewPassword"
+                type="password"
+                autocomplete="new-password"
+                placeholder="Enter new admin password">
+
+            <label for="adminConfirmPassword">
+                Confirm New Password
+            </label>
+
+            <input
+                id="adminConfirmPassword"
+                type="password"
+                autocomplete="new-password"
+                placeholder="Enter new password again">
+
+            <div id="adminPasswordResult"
+                 class="youtube-api-result">
+            </div>
+
+            <div class="youtube-api-buttons">
+
+                <button
+                    type="button"
+                    id="adminPasswordSave">
+                    Change Password
+                </button>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+<!-- 3: Radio -->
+<div class="panel">
+    <iframe id="radioFrame"
+            src="/blank" data-skyfam-radio-src="true"
+            class="radio-frame">
+    </iframe>
+</div>
+
+<!-- 4: Chat -->
+<div class="panel">
+
+    <iframe
+        id="chatFrame"
+        src="/blank" data-skyfam-chat-src="true"
+        class="chat-frame"
+        allow="fullscreen"
+        allowfullscreen>
+    </iframe>
+
+</div>
+
+</div>
+
+<script>
+/* =========================================================
+   SKYFAM SERVICE ORIGINS
+   Uses the hostname currently serving SkyFam.
+   ========================================================= */
+
+const SKYFAM_CONFIGURED_DASHBOARD_ORIGIN =
+    {{ skyfam_dashboard_url|tojson }};
+
+const SKYFAM_CONFIGURED_CHAT_ORIGIN =
+    {{ skyfam_chat_url|tojson }};
+
+const SKYFAM_CONFIGURED_RADIO_ORIGIN =
+    {{ skyfam_radio_url|tojson }};
+
+function skyfamServiceOrigin(configuredUrl, port) {
+
+    const configured =
+        String(configuredUrl || "")
+            .trim()
+            .replace(/\\\/+$/, "");
+
+    if (configured) {
+        return configured;
+    }
+
+    return (
+        `${window.location.protocol}//` +
+        `${window.location.hostname}:${port}`
+    );
+}
+
+const SKYFAM_DASHBOARD_ORIGIN =
+    skyfamServiceOrigin(
+        SKYFAM_CONFIGURED_DASHBOARD_ORIGIN,
+        5000
+    );
+
+const SKYFAM_CHAT_ORIGIN =
+    skyfamServiceOrigin(
+        SKYFAM_CONFIGURED_CHAT_ORIGIN,
+        5050
+    );
+
+const SKYFAM_RADIO_ORIGIN =
+    skyfamServiceOrigin(
+        SKYFAM_CONFIGURED_RADIO_ORIGIN,
+        5080
+    );
+
+document.addEventListener("DOMContentLoaded", () => {
+
+    const radioFrame =
+        document.querySelector(
+            '[data-skyfam-radio-src="true"]'
+        );
+
+    if (radioFrame) {
+        radioFrame.src =
+            SKYFAM_RADIO_ORIGIN + "/radar";
+    }
+
+    const chatFrame =
+        document.querySelector(
+            '[data-skyfam-chat-src="true"]'
+        );
+
+    if (chatFrame) {
+        chatFrame.src =
+            SKYFAM_CHAT_ORIGIN;
+    }
+
+});
+</script>
+
+<script>
+
+// Use touch-friendly wording on phones/tablets/touch devices
+function updateRyanWatchHint() {
+    const hint = document.querySelector(".ryan-live-hint");
+
+    if (!hint) return;
+
+    const touchDevice =
+        window.matchMedia("(pointer: coarse)").matches ||
+        navigator.maxTouchPoints > 0;
+
+    hint.textContent =
+        touchDevice
+            ? "(Tap here to watch)"
+            : "(Click here to watch)";
+}
+
+updateRyanWatchHint();
+
+/* ==================== Slideshow ==================== */
+let images = {{ photos|tojson }};
+let index =
+    parseInt(
+        localStorage.getItem("slideshowIndex")
+    ) || 0;
+
+if (index >= images.length) {
+    index = 0;
+}
+
+
+const main = document.getElementById("slide-main");
+const fill = document.getElementById("slide-fill");
+let slideshowPaused = false;
+main.style.cursor = "pointer";
+fill.style.cursor = "pointer";
+
+main.onclick = () => openMedia(main.src);
+fill.onclick = () => openMedia(fill.src);
+
+
+let orientations = {};
+
+const portraitFacePositions =
+    {{ face_positions | tojson }};
+
+const placeholderImageUrls = new Set([
+    "/static/photos/skyfam-welcome.svg",
+    "/static/photos/skyfam-weather.svg",
+    "/static/photos/add-your-photos.svg",
+    "/static/photos/skyfam-family-chat.svg",
+    "/static/photos/skyfam-games.svg"
+]);
+
+
+async function applyPortraitFacePosition(
+    element,
+    src
+) {
+
+    element.style.objectPosition =
+        portraitFacePositions[src] ||
+        "center top";
+}
+
+
+async function showNext() {
+    if (images.length === 0) return;
+
+    const current = images[index];
+
+    async function getOrientation(src) {
+        if (orientations[src]) {
+            return orientations[src];
+        }
+
+        return await new Promise(resolve => {
+            const img = new Image();
+
+            img.onload = () => {
+                const orientation =
+                    img.height > img.width
+                        ? "portrait"
+                        : "landscape";
+
+                orientations[src] = orientation;
+                resolve(orientation);
+            };
+
+            img.onerror = () => {
+                orientations[src] = "landscape";
+                resolve("landscape");
+            };
+
+            img.src = src;
+        });
+    }
+
+    const currentOrientation =
+        await getOrientation(current);
+
+    document.getElementById(
+        "slide-bg"
+    ).src = current;
+
+    if (images.length === 1) {
+        main.src = current;
+
+        main.style.display = "block";
+        main.style.width = "100%";
+        main.style.flex = "0 0 100%";
+        main.style.objectFit = "contain";
+        main.style.objectPosition = "center";
+
+        fill.style.display = "none";
+        fill.style.width = "";
+        fill.style.flex = "";
+
+        index = 0;
+
+        localStorage.setItem(
+            "slideshowIndex",
+            index
+        );
+
+        return;
+    }
+
+    const nextIndex =
+        (index + 1) % images.length;
+
+    const filler =
+        images[nextIndex];
+
+    const fillerOrientation =
+        await getOrientation(filler);
+
+    if (
+        currentOrientation === "landscape" &&
+        fillerOrientation === "landscape"
+    ) {
+        main.src = current;
+
+        main.style.display = "block";
+        main.style.width = "100%";
+        main.style.flex = "0 0 100%";
+        main.style.objectFit = "contain";
+        main.style.objectPosition = "center";
+
+        fill.style.display = "none";
+        fill.style.width = "";
+        fill.style.flex = "";
+        fill.style.objectFit = "";
+        fill.style.objectPosition = "";
+
+        index =
+            (index + 1) % images.length;
+    }
+
+    else if (
+        currentOrientation === "portrait" &&
+        fillerOrientation === "portrait"
+    ) {
+        main.src = current;
+        fill.src = filler;
+
+        main.style.display = "block";
+        main.style.width = "50%";
+        main.style.flex = "0 0 50%";
+        main.style.objectFit = "cover";
+        await applyPortraitFacePosition(
+            main,
+            current
+        );
+
+        fill.style.display = "block";
+        fill.style.width = "50%";
+        fill.style.flex = "0 0 50%";
+        fill.style.objectFit = "cover";
+        await applyPortraitFacePosition(
+            fill,
+            filler
+        );
+
+        index =
+            (index + 2) % images.length;
+    }
+
+    else if (
+        currentOrientation === "portrait" &&
+        fillerOrientation === "landscape"
+    ) {
+        main.src = current;
+        fill.src = filler;
+
+        main.style.display = "block";
+        main.style.width = "40%";
+        main.style.flex = "0 0 40%";
+        main.style.objectFit = "cover";
+        await applyPortraitFacePosition(
+            main,
+            current
+        );
+
+        fill.style.display = "block";
+        fill.style.width = "60%";
+        fill.style.flex = "0 0 60%";
+        fill.style.objectFit = "cover";
+        fill.style.objectPosition = "center";
+
+        index =
+            (index + 2) % images.length;
+    }
+
+    else {
+        main.src = current;
+        fill.src = filler;
+
+        main.style.display = "block";
+        main.style.width = "60%";
+        main.style.flex = "0 0 60%";
+        main.style.objectFit = "cover";
+        main.style.objectPosition = "center";
+
+        fill.style.display = "block";
+        fill.style.width = "40%";
+        fill.style.flex = "0 0 40%";
+        fill.style.objectFit = "cover";
+        await applyPortraitFacePosition(
+            fill,
+            filler
+        );
+
+        index =
+            (index + 2) % images.length;
+    }
+
+    localStorage.setItem(
+        "slideshowIndex",
+        index
+    );
+}
+
+showNext();
+
+setInterval(() => {
+
+    if (!slideshowPaused) {
+        showNext();
+    }
+
+}, 60000);
+
+function openMedia(src) {
+
+    slideshowPaused = true;
+
+    document.getElementById(
+        "overlayImage"
+    ).src = src;
+
+    document.getElementById(
+        "mediaOverlay"
+    ).style.display = "flex";
+}
+
+function closeMedia() {
+
+    slideshowPaused = false;
+
+    document.getElementById(
+        "mediaOverlay"
+    ).style.display = "none";
+
+    document.getElementById(
+        "overlayImage"
+    ).src = "";
+}
+
+// ==================== YallBot / Ryan Hall Controls ====================
+
+const YALLBOT_VIDEO_ID =
+    "rqHW2HhgGQ0";
+
+let yallbotPlayer;
+let currentVideoMode =
+    "yallbot";
+
+let forceYallbotPaused =
+    false;
+
+function pauseRadio() {
+
+    radioFrame.contentWindow.postMessage(
+        {
+            action: "pauseRadio"
+        },
+        SKYFAM_RADIO_ORIGIN
+    );
+
+}
+
+function pauseYouTube() {
+
+    if (
+        yallbotPlayer &&
+        typeof yallbotPlayer.pauseVideo === "function"
+    ) {
+
+        yallbotPlayer.pauseVideo();
+
+    }
+
+}
+
+
+function pauseFamilyChatMedia() {
+
+    const chatFrame =
+        document.getElementById(
+            "chatFrame"
+        );
+
+    if (
+        !chatFrame ||
+        !chatFrame.contentWindow
+    ) {
+        return;
+    }
+
+    chatFrame.contentWindow.postMessage(
+        {
+            action:
+                "pauseFamilyChatMedia"
+        },
+        SKYFAM_CHAT_ORIGIN
+    );
+
+}
+
+function switchToYallbot() {
+
+    pauseRadio();
+    pauseFamilyChatMedia();
+
+    currentVideoMode =
+        "yallbot";
+
+    if (!yallbotPlayer) {
+        return;
+    }
+
+    /*
+     * After leaving a manual Live Event,
+     * automatic returns to YallBot must
+     * remain paused.
+     */
+    if (
+        forceYallbotPaused &&
+        typeof yallbotPlayer.cueVideoById ===
+            "function"
+    ) {
+
+        yallbotPlayer.cueVideoById(
+            YALLBOT_VIDEO_ID
+        );
+
+        return;
+    }
+
+    if (
+        typeof yallbotPlayer.loadVideoById ===
+            "function"
+    ) {
+
+        yallbotPlayer.loadVideoById(
+            YALLBOT_VIDEO_ID
+        );
+    }
+
+}
+
+function switchToYallbotPaused() {
+
+    forceYallbotPaused =
+        true;
+
+    /*
+     * The lock exists only to survive the transition
+     * away from a manual Live Event. Release it after
+     * the player has settled so a person can press
+     * Play on YallBot normally.
+     */
+    setTimeout(
+        () => {
+            forceYallbotPaused =
+                false;
+        },
+        1500
+    );
+
+    pauseRadio();
+    pauseFamilyChatMedia();
+
+    currentVideoMode =
+        "yallbot";
+
+    if (
+        yallbotPlayer &&
+        typeof yallbotPlayer.cueVideoById ===
+            "function"
+    ) {
+
+        yallbotPlayer.cueVideoById(
+            YALLBOT_VIDEO_ID
+        );
+
+        if (
+            typeof yallbotPlayer.pauseVideo ===
+                "function"
+        ) {
+
+            yallbotPlayer.pauseVideo();
+        }
+    }
+}
+
+
+function switchToRyanHall() {
+
+    forceYallbotPaused =
+        false;
+
+    pauseRadio();
+    pauseFamilyChatMedia();
+
+    if (
+        !liveStatus.live ||
+        !liveStatus.videoId
+    ) {
+
+        return;
+
+    }
+
+    currentVideoMode =
+        "ryan";
+
+    if (
+        yallbotPlayer &&
+        typeof yallbotPlayer.loadVideoById === "function"
+    ) {
+
+        yallbotPlayer.loadVideoById(
+            liveStatus.videoId
+        );
+
+    }
+
+}
+
+function onYouTubeIframeAPIReady() {
+
+    yallbotPlayer = new YT.Player(
+        "videoFrame",
+        {
+            videoId: YALLBOT_VIDEO_ID,
+
+playerVars: {
+    autoplay: 0,
+    controls: 0,
+    modestbranding: 1,
+    rel: 0,
+    playsinline: 1
+},
+
+            events: {
+
+onStateChange: (event) => {
+
+    if (event.data === YT.PlayerState.PLAYING) {
+
+        if (
+            forceYallbotPaused &&
+            currentVideoMode ===
+                "yallbot"
+        ) {
+
+            yallbotPlayer.pauseVideo();
+            return;
+        }
+
+        pauseRadio();
+        pauseFamilyChatMedia();
+
+    }
+
+}
+            }
+        }
+    );
+
+}
+
+function playYallbot() {
+
+    forceYallbotPaused =
+        false;
+
+    switchToYallbot();
+
+}
+
+function pauseAll() {
+
+    pauseYouTube();
+
+}
+
+const tag =
+    document.createElement("script");
+
+tag.src =
+    "https://www.youtube.com/iframe_api";
+
+const firstScriptTag =
+    document.getElementsByTagName(
+        "script"
+    )[0];
+
+firstScriptTag.parentNode.insertBefore(
+    tag,
+    firstScriptTag
+);
+
+window.addEventListener(
+    "message",
+    (event) => {
+
+        if (
+            event.data.action ===
+            "radioStarted"
+        ) {
+
+            pauseYouTube();
+            pauseFamilyChatMedia();
+
+        }
+
+        if (
+            event.data &&
+            event.data.action ===
+                "familyChatMediaStarted"
+        ) {
+
+            const chatFrame =
+                document.getElementById(
+                    "chatFrame"
+                );
+
+            if (
+                chatFrame &&
+                event.source ===
+                    chatFrame.contentWindow
+            ) {
+
+                pauseRadio();
+                pauseYouTube();
+
+            }
+
+        }
+
+
+        if (
+            event.data.action ===
+            "stationManagement"
+        ) {
+
+            const chatFrame =
+                document.getElementById(
+                    "chatFrame"
+                );
+
+            if (
+                chatFrame &&
+                chatFrame.contentWindow
+            ) {
+
+                chatFrame.contentWindow.postMessage(
+                    {
+                        stationManagementOpen:
+                            event.data.open === true
+                    },
+                    SKYFAM_CHAT_ORIGIN
+                );
+
+            }
+
+        }
+
+    }
+);
+
+
+/* ==================== Radio ==================== */
+
+const radioFrame =
+document.getElementById(
+"radioFrame"
+);
+
+/* Focus Radio -> Pause YallBot */
+
+window.addEventListener(
+"blur",
+() => {
+
+    setTimeout(() => {
+
+        if (
+            document.activeElement ===
+            radioFrame
+        ) {
+
+            if (
+                yallbotPlayer
+            ) {
+
+                yallbotPlayer
+                .pauseVideo();
+
+            }
+
+            radioFrame
+            .contentWindow
+            .postMessage(
+                {
+                    action:
+                    "playRadio"
+                },
+                SKYFAM_RADIO_ORIGIN
+            );
+
+        }
+
+    },100);
+
+}
+);
+
+/* ===================================================== */
+/* GAMES */
+/* ===================================================== */
+
+function showSolitaire() {
+
+    document.getElementById(
+        "slide-container"
+    ).style.display = "none";
+
+    const frame =
+        document.getElementById(
+            "gameFrame"
+        );
+
+    frame.style.display = "block";
+
+frame.src =
+    "/games/solitaire/index.html";
+
+}
+
+function showMahjong() {
+
+    document.getElementById(
+        "slide-container"
+    ).style.display = "none";
+
+    const frame =
+        document.getElementById(
+            "gameFrame"
+        );
+
+    frame.style.display = "block";
+
+    frame.src =
+        "/games/mahjong/dist/index.html";
+}
+
+function showPuzzle() {
+
+    document.getElementById(
+        "slide-container"
+    ).style.display = "none";
+
+    const frame =
+        document.getElementById(
+            "gameFrame"
+        );
+
+    frame.style.display = "block";
+
+    frame.src =
+        "/games/puzzle/index.html";
+}
+
+function showBubbleShooter() {
+
+    localStorage.setItem(
+        "bubbleShooterActive",
+        "true"
+    );
+
+    document.getElementById(
+        "slide-container"
+    ).style.display = "none";
+
+    const frame =
+        document.getElementById(
+            "gameFrame"
+        );
+
+    frame.style.display = "block";
+    frame.src =
+        "/games/bubbleshooter/index.html";
+    const chatFrame =
+    document.getElementById(
+        "chatFrame"
+    );
+
+if (
+    chatFrame &&
+    chatFrame.contentWindow
+) {
+
+    chatFrame.contentWindow.postMessage(
+        {
+            bubbleShooterActive: true
+        },
+        SKYFAM_CHAT_ORIGIN
+    );
+
+}
+}
+
+function showPhotos() {
+
+    localStorage.removeItem(
+        "bubbleShooterActive"
+    );
+
+    const frame =
+        document.getElementById(
+            "gameFrame"
+        );
+
+    frame.src = "";
+    frame.style.display = "none";
+
+    document.getElementById(
+        "slide-container"
+    ).style.display = "block";
+
+    const chatFrame =
+        document.getElementById(
+            "chatFrame"
+        );
+
+    if (
+        chatFrame &&
+        chatFrame.contentWindow
+    ) {
+
+        chatFrame.contentWindow.postMessage(
+            {
+                bubbleShooterActive: false
+            },
+            SKYFAM_CHAT_ORIGIN
+        );
+
+    }
+
+}
+
+let photoHoldTimer;
+
+const photoButton =
+    document.getElementById(
+        "photoButton"
+    );
+
+photoButton.addEventListener(
+    "mousedown",
+    () => {
+
+photoHoldTimer =
+    setTimeout(
+        () => {
+
+            const picker =
+                document.createElement(
+                    "input"
+                );
+
+picker.type =
+    "file";
+
+picker.multiple =
+    true;
+
+            picker.accept =
+                ".jpg,.jpeg,.png,.webp,.gif";
+
+picker.onchange =
+    async () => {
+
+        if (
+            !picker.files.length
+        ) {
+            return;
+        }
+
+        let uploaded = 0;
+        let failed = 0;
+
+        for (
+            const file of picker.files
+        ) {
+
+            const formData =
+                new FormData();
+
+            formData.append(
+                "photo",
+                file
+            );
+
+            const response =
+                await fetch(
+                    "/api/upload-photo",
+                    {
+                        method: "POST",
+                        body: formData
+                    }
+                );
+
+            const result =
+                await response.json();
+
+            if (
+                result.success
+            ) {
+                uploaded++;
+
+                if (result.url) {
+
+                    // Remove an older copy if a file with
+                    // the same name was replaced.
+                    images = images.filter(
+                        src => src !== result.url
+                    );
+
+                    // Uploaded files are newest first,
+                    // matching the server-side slideshow order.
+                    images.unshift(
+                        result.url
+                    );
+
+                    portraitFacePositions[
+                        result.url
+                    ] =
+                        result.face_position ||
+                        "center top";
+
+                    delete orientations[
+                        result.url
+                    ];
+                }
+
+            } else {
+                failed++;
+            }
+
+        }
+
+        if (uploaded > 0) {
+            index = 0;
+
+            localStorage.setItem(
+                "slideshowIndex",
+                index
+            );
+
+            await showNext();
+        }
+
+const toast =
+    document.getElementById(
+        "uploadToast"
+    );
+
+toast.textContent =
+    "✓ " +
+    uploaded +
+    " photo(s) uploaded" +
+    (
+        failed
+            ? ", " + failed + " failed"
+            : ""
+    );
+
+toast.style.opacity =
+    "1";
+
+setTimeout(
+    () => {
+
+        toast.style.opacity =
+            "0";
+
+    },
+    3000
+);
+
+    };
+ picker.click();
+
+         },
+         3000
+     );
+
+     }
+);
+
+photoButton.addEventListener(
+    "mouseup",
+    () => {
+
+        clearTimeout(
+            photoHoldTimer
+        );
+
+    }
+);
+
+photoButton.addEventListener(
+    "mouseleave",
+    () => {
+
+        clearTimeout(
+            photoHoldTimer
+        );
+
+    }
+);
+
+let gameBarTimer;
+
+const gameBar =
+    document.getElementById(
+        "gameBar"
+    );
+
+const touchNavigation =
+    window.matchMedia(
+        "(pointer: coarse)"
+    ).matches ||
+    navigator.maxTouchPoints > 0;
+
+function hideGameBar() {
+
+    clearTimeout(
+        gameBarTimer
+    );
+
+    gameBar.classList.remove(
+        "visible"
+    );
+}
+
+function showGameBarTemporarily(
+    timeout = 3000
+) {
+
+    gameBar.classList.add(
+        "visible"
+    );
+
+    clearTimeout(
+        gameBarTimer
+    );
+
+    gameBarTimer =
+        setTimeout(
+            hideGameBar,
+            timeout
+        );
+}
+
+if (touchNavigation) {
+
+    const touchNavButton =
+        document.createElement(
+            "button"
+        );
+
+    touchNavButton.id =
+        "touchNavButton";
+
+    touchNavButton.type =
+        "button";
+
+    touchNavButton.textContent =
+        "☰";
+
+    touchNavButton.setAttribute(
+        "aria-label",
+        "Show SkyFam navigation"
+    );
+
+    touchNavButton.setAttribute(
+        "title",
+        "Show navigation"
+    );
+
+    document.body.appendChild(
+        touchNavButton
+    );
+
+    touchNavButton.addEventListener(
+        "click",
+        (event) => {
+
+            event.preventDefault();
+            event.stopPropagation();
+
+            if (
+                gameBar.classList.contains(
+                    "visible"
+                )
+            ) {
+
+                hideGameBar();
+
+            } else {
+
+                showGameBarTemporarily(
+                    5000
+                );
+            }
+        }
+    );
+
+    gameBar.addEventListener(
+        "click",
+        (event) => {
+
+            if (
+                event.target.closest(
+                    "button"
+                )
+            ) {
+
+                setTimeout(
+                    hideGameBar,
+                    250
+                );
+            }
+        }
+    );
+
+} else {
+
+    document.addEventListener(
+        "mousemove",
+        () => {
+
+            showGameBarTemporarily(
+                3000
+            );
+        }
+    );
+
+    document.addEventListener(
+        "mouseleave",
+        () => {
+
+            showGameBarTemporarily(
+                3000
+            );
+        }
+    );
+}
+
+const YALLBOT_URL =
+    "https://www.youtube.com/embed/rqHW2HhgGQ0?enablejsapi=1&autoplay=0&controls=0&modestbranding=1&rel=0";
+
+let liveStatus = {
+    live: false,
+    videoId: null
+};
+
+let featuredVideo = {
+    enabled: false,
+    videoId: null,
+    title: ""
+};
+
+async function checkLiveChannel() {
+
+    try {
+
+        const response =
+            await fetch(
+                "/static/live_channel.json?" +
+                Date.now()
+            );
+
+        liveStatus =
+            await response.json();
+
+        const alert =
+            document.getElementById(
+                "ryanAlert"
+            );
+
+        const closeRyan =
+            document.getElementById(
+                "closeRyan"
+            );
+
+        alert.style.display =
+            liveStatus.live
+                ? "inline"
+                : "none";
+
+        if (
+            !liveStatus.live
+        ) {
+
+            alert.style.animation =
+                "none";
+
+            /*
+             * Do not hide the Close button while a
+             * manual Live Event is being displayed.
+             */
+            if (
+                currentVideoMode !==
+                "featured"
+            ) {
+
+                closeRyan.style.display =
+                    "none";
+            }
+
+            if (
+                currentVideoMode ===
+                "ryan"
+            ) {
+
+                switchToYallbot();
+
+            }
+
+        } else if (
+            closeRyan.style.display ===
+            "none"
+        ) {
+
+            alert.style.animation =
+                "ryanBlink 2s infinite";
+
+        }
+
+    } catch (e) {
+
+        console.error(
+            "Unable to read live status",
+            e
+        );
+
+    }
+
+}
+
+let loadedFeaturedVideoId = null;
+let dismissedFeaturedVideoId = null;
+
+async function checkFeaturedVideo() {
+
+    try {
+
+        const response =
+            await fetch(
+                "/api/live-event-status?" +
+                Date.now(),
+                {
+                    cache: "no-store"
+                }
+            );
+
+        featuredVideo =
+            await response.json();
+
+        const alert =
+            document.getElementById(
+                "featuredAlert"
+            );
+
+        alert.style.display =
+            featuredVideo.enabled
+                ? "inline"
+                : "none";
+
+        alert.textContent =
+            "📺 " + (
+                featuredVideo.title ||
+                "Live YouTube Event"
+            );
+
+        /*
+         * A manually started Live Event is a
+         * server-wide broadcast. Every connected
+         * SkyFam dashboard switches to it.
+         */
+        if (
+            featuredVideo.enabled &&
+            featuredVideo.videoId
+        ) {
+
+            if (
+                dismissedFeaturedVideoId ===
+                    featuredVideo.videoId
+            ) {
+
+                return;
+            }
+
+            if (
+                currentVideoMode !==
+                    "featured" ||
+                loadedFeaturedVideoId !==
+                    featuredVideo.videoId
+            ) {
+
+                currentVideoMode =
+                    "featured";
+
+                pauseRadio();
+
+                if (
+                    typeof pauseFamilyChatMedia ===
+                    "function"
+                ) {
+
+                    pauseFamilyChatMedia();
+                }
+
+                if (
+                    yallbotPlayer &&
+                    typeof yallbotPlayer.loadVideoById ===
+                        "function"
+                ) {
+
+                    yallbotPlayer.loadVideoById(
+                        featuredVideo.videoId
+                    );
+
+                    loadedFeaturedVideoId =
+                        featuredVideo.videoId;
+
+                    const autoplayVideoId =
+                        featuredVideo.videoId;
+
+                    setTimeout(
+                        () => {
+
+                            /*
+                             * Only autoplay if this exact
+                             * manual Live Event is still
+                             * the active video.
+                             */
+                            if (
+                                currentVideoMode ===
+                                    "featured" &&
+                                featuredVideo.enabled &&
+                                featuredVideo.videoId ===
+                                    autoplayVideoId &&
+                                loadedFeaturedVideoId ===
+                                    autoplayVideoId &&
+                                yallbotPlayer &&
+                                typeof yallbotPlayer
+                                    .playVideo ===
+                                    "function"
+                            ) {
+
+                                yallbotPlayer.playVideo();
+                            }
+
+                        },
+                        500
+                    );
+                }
+
+                document.getElementById(
+                    "closeRyan"
+                ).style.display =
+                    "block";
+
+                document.getElementById(
+                    "fullscreenRyan"
+                ).style.display =
+                    "block";
+            }
+
+        } else {
+
+            loadedFeaturedVideoId =
+                null;
+
+            dismissedFeaturedVideoId =
+                null;
+
+            /*
+             * If a broadcast event was stopped,
+             * return this client to normal YallBot.
+             */
+            if (
+                currentVideoMode ===
+                "featured"
+            ) {
+
+                switchToYallbotPaused();
+
+                document.getElementById(
+                    "closeRyan"
+                ).style.display =
+                    "none";
+
+                document.getElementById(
+                    "fullscreenRyan"
+                ).style.display =
+                    "none";
+
+                document.getElementById(
+                    "returnRyan"
+                ).style.display =
+                    "none";
+
+                document.getElementById(
+                    "youtubePanel"
+                ).classList.remove(
+                    "ryanFullscreen"
+                );
+            }
+        }
+
+    } catch (e) {
+
+        console.error(
+            "Unable to read featured video",
+            e
+        );
+
+    }
+
+}
+
+checkLiveChannel();
+
+setInterval(
+    checkLiveChannel,
+    60000
+);
+
+checkFeaturedVideo();
+
+setInterval(
+    checkFeaturedVideo,
+    5000
+);
+
+document.getElementById(
+    "ryanAlert"
+).addEventListener(
+    "click",
+    () => {
+
+switchToRyanHall();
+
+document.getElementById(
+    "closeRyan"
+).style.display =
+    "block";
+
+document.getElementById(
+    "fullscreenRyan"
+).style.display =
+    "block";
+
+document.getElementById(
+    "ryanAlert"
+).style.animation =
+    "none";
+
+document.querySelector(
+    ".ryan-live-hint"
+).style.display =
+    "none";
+
+    }
+);
+
+document.getElementById(
+    "closeRyan"
+).addEventListener(
+    "click",
+    () => {
+
+        /*
+         * Closing a pushed Live Event dismisses
+         * only this event on this browser.
+         */
+        if (
+            currentVideoMode ===
+                "featured" &&
+            featuredVideo.videoId
+        ) {
+
+            dismissedFeaturedVideoId =
+                featuredVideo.videoId;
+
+            switchToYallbotPaused();
+
+        } else {
+
+            switchToYallbot();
+        }
+
+        document.getElementById(
+            "closeRyan"
+        ).style.display =
+            "none";
+
+document.getElementById(
+    "fullscreenRyan"
+).style.display =
+    "none";
+
+document.getElementById(
+    "returnRyan"
+).style.display =
+    "none";
+
+document.getElementById(
+    "youtubePanel"
+).classList.remove(
+    "ryanFullscreen"
+);
+
+        if (
+            liveStatus.live
+        ) {
+
+            document.getElementById(
+                "ryanAlert"
+            ).style.animation =
+                "ryanBlink 2s infinite";
+
+            document.querySelector(
+                ".ryan-live-hint"
+            ).style.display =
+                "block";
+
+        }
+
+    }
+);
+
+document.getElementById(
+    "fullscreenRyan"
+).addEventListener(
+    "click",
+    () => {
+
+        document.getElementById(
+            "youtubePanel"
+        ).classList.add(
+            "ryanFullscreen"
+        );
+
+        document.getElementById(
+            "fullscreenRyan"
+        ).style.display =
+            "none";
+
+        document.getElementById(
+            "returnRyan"
+        ).style.display =
+            "block";
+
+    }
+);
+
+document.getElementById(
+    "returnRyan"
+).addEventListener(
+    "click",
+    () => {
+
+        document.getElementById(
+            "youtubePanel"
+        ).classList.remove(
+            "ryanFullscreen"
+        );
+
+        document.getElementById(
+            "returnRyan"
+        ).style.display =
+            "none";
+
+        document.getElementById(
+            "fullscreenRyan"
+        ).style.display =
+            "block";
+
+    }
+);
+
+document.getElementById(
+    "featuredAlert"
+).addEventListener(
+    "click",
+    () => {
+
+        currentVideoMode =
+            "featured";
+
+        pauseRadio();
+
+        yallbotPlayer.loadVideoById(
+            featuredVideo.videoId
+        );
+
+        document.getElementById(
+            "closeRyan"
+        ).style.display =
+            "block";
+
+        document.getElementById(
+            "fullscreenRyan"
+        ).style.display =
+            "block";
+
+        document.getElementById(
+            "featuredAlert"
+        ).style.animation =
+            "none";
+
+    }
+);
+
+</script>
+
+<div id="mediaOverlay">
+
+    <button id="closeMedia"
+            onclick="closeMedia()">
+        ✖ Close
+    </button>
+
+    <img id="overlayImage">
+
+</div>
+
+
+<script>
+/* =========================================================
+   SKYFAM RADAR TARGETED FOCUS FORWARDER
+   ========================================================= */
+
+window.addEventListener(
+    "message",
+    event => {
+
+        if (
+            !event.data ||
+            event.data.action !==
+                "familyChatFocusPause"
+        ) {
+            return;
+        }
+
+        const radioFrame =
+            document.getElementById(
+                "radioFrame"
+            );
+
+        const chatFrame =
+            document.getElementById(
+                "chatFrame"
+            );
+
+        if (
+            !radioFrame ||
+            !chatFrame
+        ) {
+            console.log(
+                "SkyFam focus forwarder: iframe missing"
+            );
+            return;
+        }
+
+        if (
+            event.source !==
+            radioFrame.contentWindow
+        ) {
+            return;
+        }
+
+        console.log(
+            "Forwarding FamilyChat autofocus pause:",
+            event.data.paused
+        );
+
+        chatFrame.contentWindow.postMessage(
+            {
+                familyChatFocusPause:
+                    event.data.paused === true
+            },
+            SKYFAM_CHAT_ORIGIN
+        );
+
+    }
+);
+</script>
+
+
+<script>
+/* ==================== YouTube API Admin Hold ==================== */
+
+(() => {
+
+    const holdTarget =
+        document.getElementById(
+            "yallbotAdminHold"
+        );
+
+    const modal =
+        document.getElementById(
+            "youtubeApiModal"
+        );
+
+    const keyInput =
+        document.getElementById(
+            "youtubeApiKey"
+        );
+
+    const passwordInput =
+        document.getElementById(
+            "youtubeApiPassword"
+        );
+
+    const result =
+        document.getElementById(
+            "youtubeApiResult"
+        );
+
+    const status =
+        document.getElementById(
+            "youtubeApiCurrentStatus"
+        );
+
+    const testButton =
+        document.getElementById(
+            "youtubeApiTest"
+        );
+
+    const saveButton =
+        document.getElementById(
+            "youtubeApiSave"
+        );
+
+    const cancelButton =
+        document.getElementById(
+            "youtubeApiCancel"
+        );
+
+    if (
+        !holdTarget ||
+        !modal
+    ) {
+        return;
+    }
+
+    let holdTimer = null;
+    let holdTriggered = false;
+
+
+    function cancelHold() {
+
+        if (holdTimer) {
+
+            clearTimeout(
+                holdTimer
+            );
+
+            holdTimer = null;
+        }
+
+        holdTarget.classList.remove(
+            "admin-holding"
+        );
+    }
+
+
+    async function refreshStatus() {
+
+        try {
+
+            const response =
+                await fetch(
+                    "/api/youtube-key-status",
+                    {
+                        cache: "no-store"
+                    }
+                );
+
+            const data =
+                await response.json();
+
+            status.textContent =
+                data.configured
+                    ? "✓ YouTube API key is currently configured."
+                    : "Ryan Hall Live detection is currently disabled.";
+
+        } catch (error) {
+
+            status.textContent =
+                "Unable to read API configuration status.";
+        }
+    }
+
+
+    function setFamilyChatFocusPause(paused) {
+
+        const chatFrame =
+            document.getElementById(
+                "chatFrame"
+            );
+
+        if (
+            chatFrame &&
+            chatFrame.contentWindow
+        ) {
+
+            chatFrame.contentWindow.postMessage(
+                {
+                    familyChatFocusPause:
+                        paused
+                },
+                "*"
+            );
+
+        }
+    }
+
+
+    function openSettings() {
+
+        holdTriggered = true;
+
+        setFamilyChatFocusPause(
+            true
+        );
+
+        modal.style.display =
+            "flex";
+
+        keyInput.value = "";
+        passwordInput.value = "";
+        result.textContent = "";
+
+        cancelButton.textContent =
+            "Cancel";
+
+        cancelButton.style.background =
+            "";
+
+        cancelButton.style.color =
+            "";
+
+        cancelButton.style.borderColor =
+            "";
+
+        refreshStatus();
+
+        setTimeout(
+            () => keyInput.focus(),
+            50
+        );
+    }
+
+
+    function closeSettings() {
+
+        modal.style.display =
+            "none";
+
+        keyInput.value = "";
+        passwordInput.value = "";
+        result.textContent = "";
+
+        setFamilyChatFocusPause(
+            false
+        );
+    }
+
+
+    holdTarget.addEventListener(
+        "pointerdown",
+        (event) => {
+
+            if (
+                event.button !== undefined &&
+                event.button !== 0
+            ) {
+                return;
+            }
+
+            holdTriggered = false;
+
+            cancelHold();
+
+            /*
+             * Force the browser to render the zero-width
+             * progress bar before starting the transition.
+             */
+            void holdTarget.offsetWidth;
+
+            holdTarget.classList.add(
+                "admin-holding"
+            );
+
+            holdTimer =
+                setTimeout(
+                    () => {
+
+                        holdTimer = null;
+
+                        holdTarget.classList.remove(
+                            "admin-holding"
+                        );
+
+                        openSettings();
+
+                    },
+                    3000
+                );
+        }
+    );
+
+
+    [
+        "pointerup",
+        "pointercancel",
+        "pointerleave"
+    ].forEach(
+        eventName => {
+
+            holdTarget.addEventListener(
+                eventName,
+                cancelHold
+            );
+        }
+    );
+
+
+    holdTarget.addEventListener(
+        "contextmenu",
+        (event) => {
+
+            if (
+                holdTimer ||
+                holdTriggered
+            ) {
+                event.preventDefault();
+            }
+        }
+    );
+
+
+    cancelButton.addEventListener(
+        "click",
+        closeSettings
+    );
+
+
+    modal.addEventListener(
+        "click",
+        (event) => {
+
+            if (event.target === modal) {
+                closeSettings();
+            }
+        }
+    );
+
+
+    async function sendKeyRequest(url) {
+
+        result.textContent =
+            "Checking YouTube API key...";
+
+        try {
+
+            const response =
+                await fetch(
+                    url,
+                    {
+                        method: "POST",
+                        headers: {
+                            "Content-Type":
+                                "application/json"
+                        },
+                        body: JSON.stringify({
+                            api_key:
+                                keyInput.value.trim(),
+                            password:
+                                passwordInput.value
+                        })
+                    }
+                );
+
+            const data =
+                await response.json();
+
+            if (!response.ok) {
+
+                throw new Error(
+                    data.error ||
+                    data.message ||
+                    "Request failed."
+                );
+            }
+
+            result.textContent =
+                "✓ " +
+                (
+                    data.message ||
+                    "YouTube API key works."
+                );
+
+            if (
+                url ===
+                "/api/youtube-key-save"
+            ) {
+
+                cancelButton.textContent =
+                    "Close";
+
+            }
+
+            return true;
+
+        } catch (error) {
+
+            result.textContent =
+                "✗ " + error.message;
+
+            return false;
+        }
+    }
+
+
+    testButton.addEventListener(
+        "click",
+        async () => {
+
+            await sendKeyRequest(
+                "/api/youtube-key-test"
+            );
+        }
+    );
+
+
+    saveButton.addEventListener(
+        "click",
+        async () => {
+
+            const success =
+                await sendKeyRequest(
+                    "/api/youtube-key-save"
+                );
+
+            if (!success) {
+                return;
+            }
+
+            cancelButton.textContent =
+                "Close";
+
+            cancelButton.style.background =
+                "#2d6cdf";
+
+            cancelButton.style.color =
+                "#ffffff";
+
+            cancelButton.style.borderColor =
+                "#2459b8";
+
+            await refreshStatus();
+
+            keyInput.value = "";
+
+            /*
+             * Refresh Ryan Hall status immediately
+             * instead of waiting for the next 15-minute cron run.
+             */
+            if (
+                typeof checkLiveChannel ===
+                "function"
+            ) {
+                setTimeout(
+                    checkLiveChannel,
+                    500
+                );
+            }
+        }
+    );
+
+})();
+</script>
+
+
+<script>
+/* ==================== SkyFam Live YouTube Event ==================== */
+
+(() => {
+
+    const apiSection =
+        document.getElementById(
+            "youtubeApiSection"
+        );
+
+    const liveSection =
+        document.getElementById(
+            "youtubeLiveSection"
+        );
+
+    const apiTab =
+        document.getElementById(
+            "youtubeAdminApiTab"
+        );
+
+    const liveTab =
+        document.getElementById(
+            "youtubeAdminLiveTab"
+        );
+
+    const backButton =
+        document.getElementById(
+            "liveEventBack"
+        );
+
+    const urlInput =
+        document.getElementById(
+            "liveEventUrl"
+        );
+
+    const titleInput =
+        document.getElementById(
+            "liveEventTitle"
+        );
+
+    const passwordInput =
+        document.getElementById(
+            "liveEventPassword"
+        );
+
+    const status =
+        document.getElementById(
+            "liveEventCurrentStatus"
+        );
+
+    const result =
+        document.getElementById(
+            "liveEventResult"
+        );
+
+    const startButton =
+        document.getElementById(
+            "liveEventStart"
+        );
+
+    const stopButton =
+        document.getElementById(
+            "liveEventStop"
+        );
+
+    if (
+        !apiSection ||
+        !liveSection ||
+        !apiTab ||
+        !liveTab
+    ) {
+        return;
+    }
+
+
+    function setActiveTab(button) {
+
+        apiTab.style.background = "";
+        apiTab.style.color = "";
+
+        liveTab.style.background = "";
+        liveTab.style.color = "";
+
+        button.style.background =
+            "#2d6cdf";
+
+        button.style.color =
+            "#ffffff";
+    }
+
+
+    function showApiSettings() {
+
+        apiSection.style.display =
+            "block";
+
+        liveSection.style.display =
+            "none";
+
+        setActiveTab(
+            apiTab
+        );
+    }
+
+
+    async function refreshLiveEventStatus() {
+
+        try {
+
+            const response =
+                await fetch(
+                    "/api/live-event-status",
+                    {
+                        cache: "no-store"
+                    }
+                );
+
+            const data =
+                await response.json();
+
+            if (data.enabled) {
+
+                status.textContent =
+                    "✓ Manual live event is active: " +
+                    (
+                        data.title ||
+                        data.videoId
+                    );
+
+                if (
+                    data.videoId &&
+                    !urlInput.value
+                ) {
+
+                    urlInput.value =
+                        "https://www.youtube.com/watch?v=" +
+                        data.videoId;
+                }
+
+                if (
+                    data.title &&
+                    !titleInput.value
+                ) {
+
+                    titleInput.value =
+                        data.title;
+                }
+
+            } else {
+
+                status.textContent =
+                    "No manual live event is active.";
+            }
+
+        } catch (error) {
+
+            status.textContent =
+                "Unable to read Live Event status.";
+        }
+    }
+
+
+    function showLiveEvent() {
+
+        apiSection.style.display =
+            "none";
+
+        liveSection.style.display =
+            "block";
+
+        result.textContent = "";
+        passwordInput.value = "";
+
+        setActiveTab(
+            liveTab
+        );
+
+        refreshLiveEventStatus();
+
+        setTimeout(
+            () => urlInput.focus(),
+            50
+        );
+    }
+
+
+    async function sendLiveEventRequest(
+        endpoint
+    ) {
+
+        result.textContent =
+            endpoint === "/api/live-event-start"
+                ? "Starting live event..."
+                : "Stopping live event...";
+
+        try {
+
+            const body = {
+                password:
+                    passwordInput.value
+            };
+
+            if (
+                endpoint ===
+                "/api/live-event-start"
+            ) {
+
+                body.url =
+                    urlInput.value.trim();
+
+                body.title =
+                    titleInput.value.trim();
+            }
+
+            const response =
+                await fetch(
+                    endpoint,
+                    {
+                        method: "POST",
+                        headers: {
+                            "Content-Type":
+                                "application/json"
+                        },
+                        body:
+                            JSON.stringify(
+                                body
+                            )
+                    }
+                );
+
+            const data =
+                await response.json();
+
+            if (!response.ok) {
+
+                throw new Error(
+                    data.error ||
+                    data.message ||
+                    "Request failed."
+                );
+            }
+
+            result.textContent =
+                "✓ " +
+                (
+                    data.message ||
+                    "Done."
+                );
+
+            passwordInput.value = "";
+
+            await refreshLiveEventStatus();
+
+            if (
+                typeof checkFeaturedVideo ===
+                "function"
+            ) {
+
+                await checkFeaturedVideo();
+            }
+
+            return data;
+
+        } catch (error) {
+
+            result.textContent =
+                "✗ " + error.message;
+
+            return null;
+        }
+    }
+
+
+    apiTab.addEventListener(
+        "click",
+        showApiSettings
+    );
+
+
+    liveTab.addEventListener(
+        "click",
+        showLiveEvent
+    );
+
+
+    backButton.addEventListener(
+        "click",
+        showApiSettings
+    );
+
+
+    startButton.addEventListener(
+        "click",
+        async () => {
+
+            const data =
+                await sendLiveEventRequest(
+                    "/api/live-event-start"
+                );
+
+            if (
+                !data ||
+                !data.videoId
+            ) {
+                return;
+            }
+
+            currentVideoMode =
+                "featured";
+
+            pauseRadio();
+
+            if (
+                typeof pauseFamilyChatMedia ===
+                "function"
+            ) {
+
+                pauseFamilyChatMedia();
+            }
+
+            if (
+                yallbotPlayer &&
+                typeof yallbotPlayer.loadVideoById ===
+                    "function"
+            ) {
+
+                yallbotPlayer.loadVideoById(
+                    data.videoId
+                );
+            }
+
+            document.getElementById(
+                "closeRyan"
+            ).style.display =
+                "block";
+
+            document.getElementById(
+                "fullscreenRyan"
+            ).style.display =
+                "block";
+        }
+    );
+
+
+    stopButton.addEventListener(
+        "click",
+        async () => {
+
+            const data =
+                await sendLiveEventRequest(
+                    "/api/live-event-stop"
+                );
+
+            if (!data) {
+                return;
+            }
+
+            urlInput.value = "";
+            titleInput.value = "";
+
+            if (
+                currentVideoMode ===
+                "featured"
+            ) {
+
+                switchToYallbot();
+
+                document.getElementById(
+                    "closeRyan"
+                ).style.display =
+                    "none";
+
+                document.getElementById(
+                    "fullscreenRyan"
+                ).style.display =
+                    "none";
+
+                document.getElementById(
+                    "returnRyan"
+                ).style.display =
+                    "none";
+
+                document.getElementById(
+                    "youtubePanel"
+                ).classList.remove(
+                    "ryanFullscreen"
+                );
+            }
+        }
+    );
+
+
+    showApiSettings();
+
+})();
+</script>
+
+
+<script>
+/* ==================== SkyFam Admin Password ==================== */
+
+(() => {
+
+    const apiTab =
+        document.getElementById(
+            "youtubeAdminApiTab"
+        );
+
+    const liveTab =
+        document.getElementById(
+            "youtubeAdminLiveTab"
+        );
+
+    const passwordTab =
+        document.getElementById(
+            "youtubeAdminPasswordTab"
+        );
+
+    const apiSection =
+        document.getElementById(
+            "youtubeApiSection"
+        );
+
+    const liveSection =
+        document.getElementById(
+            "youtubeLiveSection"
+        );
+
+    const passwordSection =
+        document.getElementById(
+            "youtubePasswordSection"
+        );
+
+    const currentInput =
+        document.getElementById(
+            "adminCurrentPassword"
+        );
+
+    const newInput =
+        document.getElementById(
+            "adminNewPassword"
+        );
+
+    const confirmInput =
+        document.getElementById(
+            "adminConfirmPassword"
+        );
+
+    const result =
+        document.getElementById(
+            "adminPasswordResult"
+        );
+
+    const saveButton =
+        document.getElementById(
+            "adminPasswordSave"
+        );
+
+    const liveBack =
+        document.getElementById(
+            "liveEventBack"
+        );
+
+    if (
+        !apiTab ||
+        !liveTab ||
+        !passwordTab ||
+        !apiSection ||
+        !liveSection ||
+        !passwordSection
+    ) {
+        return;
+    }
+
+
+    function clearPasswordTabStyle() {
+
+        passwordTab.style.background = "";
+        passwordTab.style.color = "";
+    }
+
+
+    function leavePasswordTab() {
+
+        passwordSection.style.display =
+            "none";
+
+        clearPasswordTabStyle();
+    }
+
+
+    apiTab.addEventListener(
+        "click",
+        leavePasswordTab
+    );
+
+    liveTab.addEventListener(
+        "click",
+        leavePasswordTab
+    );
+
+    if (liveBack) {
+        liveBack.addEventListener(
+            "click",
+            leavePasswordTab
+        );
+    }
+
+
+    passwordTab.addEventListener(
+        "click",
+        () => {
+
+            apiSection.style.display =
+                "none";
+
+            liveSection.style.display =
+                "none";
+
+            passwordSection.style.display =
+                "block";
+
+            apiTab.style.background = "";
+            apiTab.style.color = "";
+
+            liveTab.style.background = "";
+            liveTab.style.color = "";
+
+            passwordTab.style.background =
+                "#2d6cdf";
+
+            passwordTab.style.color =
+                "#ffffff";
+
+            result.textContent = "";
+        }
+    );
+
+
+    async function changeAdminPassword() {
+
+        const currentPassword =
+            currentInput.value;
+
+        const newPassword =
+            newInput.value;
+
+        const confirmPassword =
+            confirmInput.value;
+
+        result.textContent = "";
+
+        if (!currentPassword) {
+            result.textContent =
+                "Enter the current admin password.";
+            return;
+        }
+
+        if (newPassword.length < 8) {
+            result.textContent =
+                "New password must be at least 8 characters.";
+            return;
+        }
+
+        if (newPassword !== confirmPassword) {
+            result.textContent =
+                "New passwords do not match.";
+            return;
+        }
+
+        saveButton.disabled = true;
+
+        try {
+
+            const response =
+                await fetch(
+                    "/api/admin-password-change",
+                    {
+                        method: "POST",
+                        headers: {
+                            "Content-Type":
+                                "application/json"
+                        },
+                        body: JSON.stringify({
+                            current_password:
+                                currentPassword,
+                            new_password:
+                                newPassword
+                        })
+                    }
+                );
+
+            const data =
+                await response.json();
+
+            if (!response.ok) {
+                result.textContent =
+                    data.error ||
+                    "Unable to change password.";
+                return;
+            }
+
+            result.textContent =
+                data.message ||
+                "Password changed successfully.";
+
+            currentInput.value = "";
+            newInput.value = "";
+            confirmInput.value = "";
+
+        } catch (error) {
+
+            result.textContent =
+                "Unable to contact the SkyFam server.";
+
+        } finally {
+
+            saveButton.disabled = false;
+        }
+    }
+
+
+    saveButton.addEventListener(
+        "click",
+        changeAdminPassword
+    );
+
+})();
+</script>
+
+</body>
+</html>
+

@@ -1,0 +1,61 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="900" viewBox="0 0 1600 900">
+<defs>
+  <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+    <stop offset="0%" stop-color="#ffd776"/>
+    <stop offset="45%" stop-color="#ffedf0"/>
+    <stop offset="100%" stop-color="#acdfff"/>
+  </linearGradient>
+</defs>
+
+<rect width="1600" height="900" fill="url(#bg)"/>
+
+<circle cx="150" cy="130" r="80" fill="#fff4a6" opacity=".8"/>
+<circle cx="1430" cy="720" r="160" fill="#84d6a4" opacity=".6"/>
+
+<rect x="160" y="120" width="1280" height="650" rx="48"
+      fill="#ffffff" opacity=".92"/>
+
+<text x="800" y="245"
+      text-anchor="middle"
+      font-family="Arial, Helvetica, sans-serif"
+      font-size="78"
+      font-weight="700"
+      fill="#244b7a">
+  Add your photos
+</text>
+
+<text x="800" y="315"
+      text-anchor="middle"
+      font-family="Arial, Helvetica, sans-serif"
+      font-size="30"
+      fill="#4b647b">
+  Click or press and hold the camera icon to upload photos.
+</text>
+
+<g transform="translate(300 390) rotate(-6)">
+  <rect width="280" height="220" rx="22" fill="#ffffff" stroke="#e7d7c9" stroke-width="8"/>
+  <rect x="22" y="22" width="236" height="155" rx="12" fill="#8dd0ff"/>
+  <circle cx="195" cy="65" r="25" fill="#ffd457"/>
+  <path d="M22 177 L90 105 L145 155 L190 115 L258 177Z" fill="#66b878"/>
+</g>
+
+<g transform="translate(655 390) rotate(4)">
+  <rect width="280" height="220" rx="22" fill="#ffffff" stroke="#e7d7c9" stroke-width="8"/>
+  <rect x="22" y="22" width="236" height="155" rx="12" fill="#ffc2c8"/>
+  <circle cx="105" cy="90" r="42" fill="#ffd7b5"/>
+  <circle cx="180" cy="95" r="38" fill="#efb895"/>
+  <path d="M55 177 Q140 120 225 177Z" fill="#7fa9e8"/>
+</g>
+
+<g transform="translate(1010 390) rotate(-3)">
+  <rect width="280" height="220" rx="22" fill="#ffffff" stroke="#e7d7c9" stroke-width="8"/>
+  <rect x="22" y="22" width="236" height="155" rx="12" fill="#bce3c8"/>
+  <path d="M22 155 Q95 95 150 145 T258 135 V177 H22Z" fill="#5ba96a"/>
+  <circle cx="205" cy="65" r="28" fill="#ffd653"/>
+</g>
+
+<circle cx="800" cy="675" r="48" fill="#409cff"/>
+<rect x="770" y="655" width="60" height="42" rx="9" fill="#ffffff"/>
+<circle cx="800" cy="676" r="15" fill="#409cff"/>
+<rect x="785" y="645" width="30" height="12" rx="5" fill="#ffffff"/>
+</svg>

@@ -1,0 +1,52 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+
+# Node dependencies
+node_modules/
+
+# Development backups
+*.bak
+*BAK*
+*.save
+*.old
+*.orig
+*.backup
+*.pre-*
+*before-*
+
+# Secrets / local configuration
+.env
+.env.*
+*.env
+
+# FamilyChat runtime data
+familychat/messages.json
+familychat/static/uploads/*
+!familychat/static/uploads/.gitkeep
+
+# Uploaded radio logos
+radio/logos/*
+!radio/logos/default-radio.svg
+
+# OS junk
+.DS_Store
+Thumbs.db
+
+# Dashboard runtime state
+dashboard/static/live_channel.json
+# Android signing credentials and generated keystores
+**/keystore.properties
+**/*.keystore
+**/*.jks
+**/*.p12
+**/*.pfx
+
+# Local snapshots and non-runtime source material
+*.before-*
+*.pre-*
+*_before_*
+dashboard/games/bubbleshooter-static/
+dashboard/games/solitaire/js/yui-unpack/yui/docs/
+dashboard/games/solitaire/js/yui-unpack/yui/tests/

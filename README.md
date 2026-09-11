@@ -1,60 +1,498 @@
 # SkyFam
 
-A free, self-hosted family dashboard for messaging, photo slideshows, weather awareness, and simple games.
+SkyFam is a self-hosted family dashboard designed for TVs, monitors, tablets, Raspberry Pis, and other always-on displays.
 
-## Status
+It combines several family-oriented features into one place:
 
-SkyFam is currently under active development and is not yet ready for public release.
+- Family dashboard
+- FamilyChat
+- Internet radio
+- YouTube livestream support
+- Manual Live Events
+- Built-in browser games
+- Photo slideshow
+- Optional HTTPS access
 
-The project is designed to run on a user's own home server, with an emphasis on simple family communication, weather awareness, and locally managed content.
+> **Project Status**
+>
+> SkyFam is currently in active testing and development.
+>
+> It is usable now, but installation steps and features may continue to change as testing continues.
 
-## Features
+---
 
-- Family messaging with photo and video attachments
-- Photo slideshow for shared family pictures
-- Interactive weather radar
-- Weather-focused dashboard content
-- Embedded weather video through YouTube
-- Simple built-in games
-- Self-hosted storage and configuration
+# What You Need
 
-## Weather Radar
+## SkyFam Server
 
-SkyFam includes an interactive weather radar designed to make local, regional, and national weather conditions easy to view from the dashboard.
+SkyFam currently targets:
 
-Users can select a location from the available city list or enter a U.S. ZIP code to center the radar on a specific area.
+**Debian 13 (Trixie)**
 
-Radar imagery is provided by external weather-data services and remains subject to the availability and terms of those providers.
+The server can be:
 
-SkyFam is not an official weather-warning or emergency-alert service. For severe weather decisions and official warnings, users should rely on the National Weather Service, local emergency management, and other appropriate official sources.
+- A physical PC
+- Mini PC
+- Virtual machine
+- Proxmox VM or LXC
+- Another Debian 13 system
 
-## Weather Video
+You will need:
 
-SkyFam can display weather-focused YouTube content using YouTube's official embedded player.
+- Internet access during installation
+- A user with `sudo` or root access
+- A network connection
+- Enough disk space for your family's photos, chat uploads, and videos
 
-The default development setup has been tested with content from Y'allBot and Ryan Hall, Y'all, whose public YouTube channels provide weather-related video and live coverage.
+You do **not** need to know Python, Flask, systemd, or GitHub to install SkyFam.
 
-All video remains hosted and delivered by YouTube. SkyFam does not download, record, restream, or redistribute video content.
+## Storage
 
-SkyFam is not affiliated with or endorsed by Y'allBot, Ryan Hall, Y'all, YouTube, or any other third-party creator or weather-media provider unless specifically stated.
+The SkyFam application itself is not especially large, but uploaded media can use much more space over time.
 
-## Screenshot
+SkyFam may store:
 
-![SkyFam dashboard](SkyFam3.png)
+- Slideshow photos
+- FamilyChat photos
+- FamilyChat videos
+- Other uploaded FamilyChat media
 
-*SkyFam dashboard showing weather radar, family messaging, photo slideshow, weather video, and built-in games.*
+Suggested starting points:
 
-## Development
+- **20 GB free** for testing and light use
+- **50 GB or more** for regular family photo use
+- **100 GB or more** if FamilyChat will regularly receive photos and videos
 
-More information, installation instructions, configuration options, and licensing details will be added as development continues.
+Video uploads can consume storage quickly.
 
-## Credits
+FamilyChat also includes an **automatic cleanup process for older uploaded files**, which helps prevent uploads from growing forever. However, you should still keep an eye on available disk space if your family shares a lot of media.
 
-SkyFam may be configured to display weather-related YouTube content from third-party creators.
+---
 
-Development and testing have included content from:
-- Y'allBot
-- Ryan Hall, Y'all
+# Display Devices
 
-All trademarks, channel names, video content, and related branding remain the property of their respective owners.
+The SkyFam server does not need to be connected directly to a TV or monitor.
 
+Once SkyFam is running, almost any device with a web browser can display it.
+
+Examples include:
+
+- Raspberry Pi
+- Windows PCs
+- Linux PCs
+- Laptops
+- Tablets
+- Kiosk computers connected to TVs or monitors
+
+A Raspberry Pi works well as a dedicated SkyFam display.
+
+The display device only needs network access to the SkyFam server.
+
+Older Raspberry Pi models may work better with a lightweight browser or kiosk renderer instead of Chromium.
+
+---
+
+# Quick Install
+
+These instructions are intended for people who may not have much GitHub or Linux experience.
+
+## 1. Install Git
+
+Log into your Debian 13 server and run:
+
+```bash
+sudo apt update
+sudo apt install -y git
+```
+
+Git is the program that downloads SkyFam from GitHub and allows you to retrieve future updates.
+
+## 2. Download SkyFam
+
+Run:
+
+```bash
+git clone https://github.com/DakotaS96/SkyFam.git
+```
+
+Then enter the SkyFam folder:
+
+```bash
+cd SkyFam
+```
+
+## 3. Run the Installer
+
+Run:
+
+```bash
+sudo bash install.sh
+```
+
+The installer handles most of the setup automatically.
+
+It will:
+
+- Install required Debian packages
+- Install SkyFam under `/opt`
+- Create the Dashboard service
+- Create the FamilyChat service
+- Create the SkyFam Radio service
+- Ask you to create a SkyFam administrator password
+- Optionally configure a YouTube Data API key
+- Configure SkyFam to start automatically after reboot
+- Start the services
+- Test that the services are responding
+- Ask how you want to access SkyFam
+
+You will be given three networking choices:
+
+1. Automatic HTTPS setup using Caddy
+2. Use your own reverse proxy
+3. Local-network-only access
+
+If you are just getting started, **LAN access only is perfectly fine**.
+
+## 4. Open SkyFam
+
+At the end of installation, SkyFam displays the local addresses you can use.
+
+The main dashboard will normally look like:
+
+```text
+http://SERVER-IP:5000
+```
+
+For example:
+
+```text
+http://192.168.1.50:5000
+```
+
+Open that address from another computer, tablet, Raspberry Pi, or kiosk device on the same network.
+
+That's it. SkyFam should now be running.
+
+---
+
+# Updating SkyFam
+
+If you installed SkyFam through GitHub, updates can be downloaded with Git.
+
+Go to the folder where you originally downloaded SkyFam:
+
+```bash
+cd SkyFam
+```
+
+Then run:
+
+```bash
+git pull
+```
+
+Because SkyFam is still being developed, check the project notes before applying major updates.
+
+Some updates may require restarting services or rerunning part of the installer.
+
+---
+
+# Raspberry Pi Kiosk Use
+
+A Raspberry Pi can be used as a dedicated SkyFam display.
+
+The Raspberry Pi does **not** need to host the SkyFam server.
+
+A typical setup looks like:
+
+```text
+SkyFam Debian Server
+        |
+      Network
+        |
+   Raspberry Pi
+        |
+   TV / Monitor
+```
+
+The Raspberry Pi simply opens the SkyFam dashboard in a browser.
+
+For example:
+
+```text
+http://YOUR-SKYFAM-SERVER:5000
+```
+
+or your configured HTTPS address.
+
+Older Raspberry Pi models may benefit from a lightweight browser or kiosk renderer rather than Chromium.
+
+More detailed Raspberry Pi kiosk instructions are planned as testing continues.
+
+---
+
+# Administrator Features
+
+SkyFam includes a hidden administrator interface.
+
+Current administrator features include:
+
+- YouTube API settings
+- Manual Live Event controls
+- Change Admin Password
+
+The SkyFam administrator password is separate from the Debian/Linux root password.
+
+Changing the SkyFam admin password does **not** change the Linux root password.
+
+The admin password is stored locally in:
+
+```text
+/etc/skyfam-admin.env
+```
+
+This file should never be uploaded to GitHub.
+
+---
+
+# YouTube Support
+
+SkyFam can optionally use the YouTube Data API for automatic livestream detection.
+
+A YouTube API key is **not required** for the basic SkyFam dashboard.
+
+If you configure one, it is stored locally in:
+
+```text
+/etc/skyfam-youtube.env
+```
+
+The key can also be changed through the SkyFam administrator interface.
+
+Never publish your YouTube API key.
+
+---
+
+# Manual Live Events
+
+SkyFam allows an administrator to temporarily send a YouTube video or livestream to connected SkyFam displays.
+
+Current features include:
+
+- Password-protected Start Event
+- Global Stop Event
+- Local Close button on individual displays
+- Return to YallBot in a paused state
+- Twelve-hour failsafe for forgotten events
+
+This can be useful for:
+
+- Family events
+- Graduation streams
+- Weather coverage
+- News events
+- Sports or community streams
+- Anything your family wants to watch together
+
+---
+
+# Photos and FamilyChat
+
+SkyFam includes a photo slideshow and FamilyChat.
+
+FamilyChat supports uploaded media such as photos and videos.
+
+Because media can become much larger than the SkyFam application itself, available storage should be monitored on systems that receive a lot of uploads.
+
+SkyFam includes an automatic cleanup process for older FamilyChat uploads to help manage storage.
+
+Slideshow photos are intended to remain available until you remove them, so a large slideshow collection can also increase storage requirements over time.
+
+---
+
+# Network Services
+
+SkyFam runs three web services:
+
+| Service | Port | Installation Folder |
+|---|---:|---|
+| Dashboard | 5000 | `/opt/dashboard` |
+| FamilyChat | 5050 | `/opt/familychat` |
+| SkyFam Radio | 5080 | `/opt/skyfam-radio` |
+
+The installer creates these systemd services:
+
+```text
+dashboard.service
+familychat.service
+skyfam-radio.service
+```
+
+To check their status:
+
+```bash
+systemctl status dashboard
+systemctl status familychat
+systemctl status skyfam-radio
+```
+
+To restart the dashboard:
+
+```bash
+sudo systemctl restart dashboard
+```
+
+---
+
+# Local Network Access
+
+You do not need a domain name to use SkyFam.
+
+If you choose:
+
+```text
+LAN access only
+```
+
+during installation, you can use the server's local IP address.
+
+Example:
+
+```text
+http://192.168.1.50:5000
+```
+
+This is the easiest setup for initial testing.
+
+---
+
+# HTTPS and Reverse Proxies
+
+SkyFam can optionally use HTTPS addresses such as:
+
+```text
+https://skyfam.example.com
+https://chat.example.com
+https://radio.example.com
+```
+
+The installer can configure Caddy automatically.
+
+You can also use your own reverse proxy, including:
+
+- Caddy
+- Nginx
+- Nginx Proxy Manager
+- Traefik
+- Cloudflare Tunnel
+- Other reverse proxies
+
+SkyFam's local backend addresses are:
+
+```text
+Dashboard:  http://127.0.0.1:5000
+FamilyChat: http://127.0.0.1:5050
+Radio:      http://127.0.0.1:5080
+```
+
+When using a reverse proxy, SkyFam stores your public URLs in:
+
+```text
+/etc/skyfam-public.env
+```
+
+Example:
+
+```text
+SKYFAM_DASHBOARD_URL=https://skyfam.example.com
+SKYFAM_CHAT_URL=https://chat.example.com
+SKYFAM_RADIO_URL=https://radio.example.com
+```
+
+---
+
+# Private Configuration
+
+Private configuration is intentionally stored outside the GitHub repository.
+
+Examples include:
+
+```text
+/etc/skyfam-admin.env
+/etc/skyfam-youtube.env
+/etc/skyfam-public.env
+```
+
+These files should never be committed to GitHub.
+
+Private runtime data such as:
+
+- FamilyChat history
+- Uploaded family photos
+- Uploaded videos
+- Personal configuration
+- API keys
+- Passwords
+
+should also remain out of the public repository.
+
+---
+
+# Games and Third-Party Software
+
+SkyFam includes several bundled open-source games and other third-party components.
+
+Some have been modified for SkyFam's kiosk/dashboard environment.
+
+Original authorship, licensing, source information, and SkyFam modification notes are documented in:
+
+```text
+THIRD_PARTY.md
+```
+
+Original license and notice files are preserved where provided by the original projects.
+
+SkyFam modifications are not endorsed by the original authors unless specifically stated.
+
+---
+
+
+# Current Support
+
+Current SkyFam server target:
+
+```text
+Debian 13 (Trixie)
+```
+
+Other Linux distributions may work, but Debian 13 is currently the supported installation target.
+
+Raspberry Pi devices are supported as SkyFam display/kiosk devices.
+
+SkyFam is still in testing, so feedback and bug reports are welcome.
+
+---
+
+# Reporting Problems
+
+If you run into a problem, useful information includes:
+
+- What you were trying to do
+- What device you were using
+- Debian version if the problem involves the server
+- Any error shown on screen
+- Relevant service status or log output
+
+Please do **not** include passwords or API keys in bug reports.
+
+---
+
+# Credits and Licensing
+
+See:
+
+```text
+THIRD_PARTY.md
+```
+
+for third-party projects, original authors, licensing, attribution, and SkyFam modification information.

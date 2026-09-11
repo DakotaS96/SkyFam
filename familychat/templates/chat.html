@@ -1,0 +1,4380 @@
+<!-- ===================================================== -->
+<!-- FAMILY CHAT - KACHAT MAIN TEMPLATE -->
+<!-- Flask + Jinja + Live Append Chat System -->
+<!-- ===================================================== -->
+
+<!-- ===================================================== -->
+<!-- PAGE STYLING / CSS -->
+<!-- Layout / Theme / Message Bubbles / Media Styling -->
+<!-- ===================================================== -->
+<!DOCTYPE html>
+<html>
+
+<head>
+
+<meta charset="UTF-8">
+
+<meta
+name="viewport"
+content="width=device-width, initial-scale=1">
+
+<title>Family Chat</title>
+
+<style>
+body {
+    margin: 0;
+
+    background:
+    linear-gradient(
+        180deg,
+        #161616 0%,
+        #0e0e0e 100%
+    );
+
+    color: white;
+
+    font-family:
+        Arial,
+        sans-serif;
+}
+
+.container {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+}
+
+.messages {
+    flex: 1;
+    overflow-y: auto;
+    padding: 12px;
+
+    overflow-anchor: none;
+}
+
+.message {
+    background: rgba(40,40,40,0.75);
+    backdrop-filter: blur(12px);
+
+    border: 1px solid rgba(255,255,255,0.06);
+
+    border-radius: 18px;
+
+    padding: 14px;
+
+    margin-bottom: 14px;
+
+    box-shadow:
+        0 4px 20px rgba(0,0,0,0.25);
+
+    transition:
+        transform 0.15s ease,
+        background 0.2s ease;
+}
+
+.message:hover {
+    transform: translateY(-1px);
+
+    background:
+        rgba(50,50,50,0.82);
+}
+
+.name {
+    font-weight: bold;
+    color: #8fd3ff;
+}
+
+.time {
+    font-size: 12px;
+    color: #aaa;
+}
+
+.text {
+    margin-top: 6px;
+    font-size: 18px;
+}
+
+img, video {
+    max-width: 100%;
+    max-height: 260px;
+    border-radius: 10px;
+    margin-top: 8px;
+}
+
+form {
+    display: flex;
+    gap: 6px;
+    padding: 10px;
+    background: #000;
+}
+
+input[type="text"] {
+    flex: 1;
+    padding: 10px;
+    border-radius: 8px;
+    border: none;
+}
+
+input[type="file"] {
+    max-width: 150px;
+    color: white;
+}
+
+button {
+    padding: 10px 14px;
+    border: none;
+    border-radius: 8px;
+    background: #2d8cff;
+    color: white;
+    font-weight: bold;
+}
+
+.media-note {
+    margin-top: 6px;
+    color: #777;
+    font-size: 12px;
+    font-style: italic;
+}
+
+.expired-media {
+    margin-top: 8px;
+    color: #999;
+    font-size: 14px;
+    font-style: italic;
+}
+
+.file-upload {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 10px 14px;
+    border-radius: 8px;
+    background: #333;
+    color: white;
+    cursor: pointer;
+    font-weight: bold;
+    min-width: 120px;
+}
+
+.file-upload input[type="file"] {
+    display: none;
+}
+
+.message-row {
+    display: flex;
+    flex: 1;
+    gap: 6px;
+}
+
+#nameInput {
+    flex: 0 0 110px;
+    max-width: 110px;
+}
+
+#messageInput {
+    flex: 1;
+}
+
+/********************************************************/
+/* EMOJI PICKER */
+/********************************************************/
+
+#emojiBtn {
+    border: none;
+    border-radius: 8px;
+    background: #333;
+    color: white;
+    font-size: 20px;
+    cursor: pointer;
+    padding: 0 12px;
+}
+
+#emojiPicker {
+    display: none;
+    position: absolute;
+    bottom: 70px;
+    left: 10px;
+    background: #222;
+    border-radius: 12px;
+    padding: 10px;
+    max-width: 300px;
+    font-size: 24px;
+    line-height: 1.5;
+    z-index: 999;
+    cursor: pointer;
+}
+
+#emojiPicker span {
+    cursor: pointer;
+    padding: 4px;
+    display: inline-block;
+}
+
+#emojiPicker span:hover {
+    transform: scale(1.2);
+}
+
+.message-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+}
+
+/* ===================================================== */
+/* DELETE BUTTON SYSTEM */
+/* ===================================================== */
+
+.delete-btn {
+
+    margin-left: auto;
+
+    background: transparent !important;
+
+    color: #aaa;
+
+    border: none;
+
+    border-radius: 8px;
+
+    padding: 4px 8px;
+
+    cursor: pointer;
+
+    font-size: 14px;
+
+    opacity: 0.45;
+
+    transition:
+        opacity 0.2s ease,
+        transform 0.15s ease;
+}
+
+.delete-btn:hover {
+
+    opacity: 1;
+
+    transform: scale(1.05);
+
+    color: #ff6b6b;
+}
+
+/* ===================================================== */
+/* YOUTUBE / FULLSCREEN VIDEO OVERLAY */
+/* ===================================================== */
+
+.video-modal {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.95);
+    z-index: 99999;
+    padding: 40px;
+}
+
+.video-modal iframe {
+    width: 100%;
+    height: 100%;
+    border-radius: 12px;
+}
+
+.close-video {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    z-index: 100000;
+    background: red;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    padding: 12px 16px;
+    font-size: 18px;
+    font-weight: bold;
+}
+
+.chat-media {
+    cursor: pointer;
+}
+
+/* ===================================================== */
+/* IMAGE / VIDEO FULLSCREEN MEDIA VIEWER */
+/* ===================================================== */
+
+#mediaOverlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.92);
+    z-index: 99999;
+
+    align-items: center;
+    justify-content: center;
+}
+
+#mediaControls {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    z-index: 100001;
+
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.media-control {
+    position: static;
+
+    min-width: 110px;
+    height: 42px;
+
+    background: #2d8cff;
+    color: white;
+
+    border: none;
+    border-radius: 8px;
+
+    padding: 8px 12px;
+
+    font-size: 14px;
+    font-weight: bold;
+
+    cursor: pointer;
+    white-space: nowrap;
+}
+
+.media-control.close {
+    background: #e32626;
+}
+
+#mediaContainer img,
+#mediaContainer video {
+    max-width: 95vw;
+    max-height: 95vh;
+    border-radius: 12px;
+}
+
+#closeMedia {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+
+    background: #222;
+    color: white;
+
+    border: none;
+    border-radius: 10px;
+
+    padding: 10px 14px;
+
+    font-size: 22px;
+    cursor: pointer;
+}
+
+.youtube-thumb {
+    position: relative;
+    display: inline-block;
+    cursor: pointer;
+    margin-top: 8px;
+}
+
+.youtube-thumb img {
+    width: 320px;
+    max-width: 100%;
+    border-radius: 12px;
+    display: block;
+}
+
+.youtube-play {
+    position: absolute;
+    inset: 0;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    font-size: 64px;
+    color: white;
+
+    text-shadow: 0 0 10px black;
+
+    background: rgba(0,0,0,0.2);
+
+    border-radius: 12px;
+}
+
+.chat-media,
+.youtube-thumb img,
+video {
+
+    max-width: 100%;
+    max-height: 420px;
+
+    width: auto;
+    height: auto;
+
+    object-fit: contain;
+
+    border-radius: 18px;
+
+    box-shadow:
+        0 6px 24px rgba(0,0,0,0.35);
+
+    transition:
+        transform 0.2s ease;
+}
+
+.chat-media:hover,
+.youtube-thumb img:hover,
+video:hover {
+
+    transform: scale(1.01);
+}
+
+#selectedFileName {
+    color: #aaa;
+    font-size: 14px;
+    align-self: center;
+    max-width: 220px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+form {
+    position: sticky;
+    bottom: 0;
+
+    backdrop-filter: blur(14px);
+
+    background:
+        rgba(0,0,0,0.72);
+
+    border-top:
+        1px solid rgba(255,255,255,0.08);
+
+    padding: 12px;
+}
+
+/* ===================================================== */
+/* MESSAGE ANIMATION */
+/* Small fade for append-only updates */
+/* ===================================================== */
+
+.message {
+    animation: messageIn 0.08s ease;
+}
+
+/* ===================================================== */
+/* MOBILE PHONE OPTIMIZATION */
+/* ===================================================== */
+
+@media (max-width: 700px) {
+
+    body {
+
+        font-size: 20px;
+
+    }
+
+    .container {
+
+        height: 100vh;
+
+    }
+
+.messages {
+
+    padding: 12px;
+
+    padding-bottom: 50px;
+
+    line-height: 1.6;
+
+}
+
+    .message {
+
+        padding: 18px;
+
+        border-radius: 18px;
+
+        margin-bottom: 16px;
+
+        max-width: 100%;
+
+    }
+
+.name {
+
+    font-size: 20px;
+
+    display: inline;
+
+}
+
+    .text {
+
+        font-size: 24px;
+
+        line-height: 1.7;
+
+        word-break: break-word;
+
+    }
+
+    img,
+    video,
+    .chat-media {
+
+        width: 100%;
+
+        max-height: 180px;
+
+        object-fit: contain;
+
+    }
+
+form {
+
+    display: flex;
+
+    flex-wrap: wrap;
+
+    gap: 6px;
+
+    padding: 8px;
+
+}
+
+#nameInput {
+
+    width: 100%;
+
+}
+
+#messageInput {
+
+    flex: 1;
+
+    min-height: 44px;
+
+    padding: 10px;
+
+    font-size: 18px;
+
+}
+
+#emojiBtn {
+
+    width: 56px;
+
+    min-height: 44px;
+
+    font-size: 24px;
+
+}
+
+.file-upload {
+
+    min-height: 44px;
+
+    width: auto;
+
+    padding: 0 12px;
+  
+    flex: 0 0 auto;
+
+}
+
+button {
+
+    width: auto;
+
+    min-height: 44px;
+
+    padding: 0 18px;
+
+    font-size: 18px;
+
+}
+
+    #emojiBtn {
+
+        width: 70px;
+
+        min-height: 56px;
+
+        font-size: 30px;
+
+    }
+
+.delete-btn {
+
+    font-size: 14px;
+
+    padding: 2px 4px;
+
+    margin-left: auto;
+
+    white-space: nowrap;
+
+    flex-shrink: 0;
+
+    min-width: fit-content;
+
+}
+
+.message-header {
+
+    display: flex;
+
+    justify-content: space-between;
+
+    align-items: center;
+
+}
+
+.message-header-left {
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 6px;
+
+    flex-wrap: nowrap;
+
+}
+
+.time {
+
+    font-size: 15px;
+
+    opacity: 0.8;
+
+    white-space: nowrap;
+
+    display: inline;
+
+    margin-left: 6px;
+
+}
+
+#emojiPicker {
+
+    left: 50%;
+
+    transform: translateX(-50%);
+
+    max-width: 90vw;
+
+    bottom: 90px;
+
+}
+
+button[type="submit"] {
+
+    flex: 1;
+
+    min-width: 0;
+
+}
+
+}
+
+
+
+/* Friendly in-page notification */
+.skyfam-toast {
+    position: fixed;
+    left: 50%;
+    bottom: 85px;
+    transform: translateX(-50%) translateY(20px);
+    z-index: 10000;
+    max-width: calc(100% - 40px);
+    padding: 12px 18px;
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    border-radius: 12px;
+    background: rgba(35, 35, 35, 0.96);
+    color: #ffffff;
+    font-size: 15px;
+    text-align: center;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s ease, transform 0.2s ease;
+}
+
+.skyfam-toast.show {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+}
+
+
+/* =========================================================
+   FAMILYCHAT YOUTUBE KIOSK CLICK SHIELDS
+   ========================================================= */
+
+
+
+
+/* =========================================================
+   FAMILYCHAT YOUTUBE FULL-PANEL LAYOUT
+   ========================================================= */
+
+.video-modal {
+    padding: 0 !important;
+}
+
+.video-modal iframe {
+    width: 100% !important;
+    height: 100% !important;
+
+    border-radius: 0 !important;
+}
+
+
+/* =========================================================
+   FAMILYCHAT YOUTUBE KIOSK CONTROL OVERRIDE
+   ========================================================= */
+
+.youtube-close {
+    position: absolute !important;
+
+    top: 8px !important;
+    right: 8px !important;
+    left: auto !important;
+
+    z-index: 100001 !important;
+
+    background: #e32626 !important;
+    color: white !important;
+
+    border: none !important;
+    border-radius: 6px !important;
+
+    padding: 5px 9px !important;
+
+    width: auto !important;
+    min-width: 0 !important;
+    height: auto !important;
+
+    font-size: 13px !important;
+    font-weight: bold !important;
+
+    cursor: pointer !important;
+}
+
+
+/* =========================================================
+   FAMILYCHAT MODERN UX
+   Contextual controls only -- keep normal chat uncluttered.
+   ========================================================= */
+
+#messageInput {
+    flex: 1;
+    box-sizing: border-box;
+    min-height: 44px;
+    max-height: 120px;
+
+    padding: 10px;
+
+    border: none;
+    border-radius: 8px;
+
+    font: inherit;
+    font-size: 18px;
+
+    resize: none;
+    overflow-y: auto;
+
+    line-height: 1.35;
+}
+
+/* Attachment appears only when something is attached */
+
+#attachmentPreview {
+    display: none;
+
+    align-items: center;
+    gap: 10px;
+
+    margin: 0 10px 8px 10px;
+    padding: 8px 10px;
+
+    background: rgba(255,255,255,0.07);
+
+    border: 1px solid rgba(255,255,255,0.10);
+    border-radius: 10px;
+
+    color: #ddd;
+}
+
+#attachmentPreview.visible {
+    display: flex;
+}
+
+#attachmentPreview img,
+#attachmentPreview video {
+    width: 72px;
+    height: 54px;
+
+    object-fit: contain;
+
+    margin: 0;
+
+    border-radius: 7px;
+
+    background: #111;
+}
+
+#attachmentPreviewInfo {
+    flex: 1;
+    min-width: 0;
+}
+
+#attachmentPreviewName {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+
+    font-size: 14px;
+}
+
+#removeAttachment {
+    flex: 0 0 auto;
+
+    min-width: 36px;
+    min-height: 36px;
+
+    padding: 4px 9px;
+
+    background: #444;
+
+    border-radius: 8px;
+
+    font-size: 16px;
+}
+
+/* Drag/drop overlay exists only while dragging a file */
+
+#dropOverlay {
+    display: none;
+
+    position: fixed;
+    inset: 10px;
+
+    z-index: 99998;
+
+    align-items: center;
+    justify-content: center;
+
+    background: rgba(20,20,20,0.92);
+
+    border: 3px dashed #65e68a;
+    border-radius: 18px;
+
+    color: white;
+
+    font-size: 26px;
+    font-weight: bold;
+
+    pointer-events: none;
+}
+
+#dropOverlay.visible {
+    display: flex;
+}
+
+/* Reply is contextual, not another permanent input-bar button */
+
+.reply-btn {
+    margin-left: 8px;
+
+    padding: 3px 7px;
+
+    min-height: 0;
+
+    background: transparent;
+
+    color: #888;
+
+    font-size: 12px;
+    font-weight: normal;
+
+    opacity: 0.55;
+
+    cursor: pointer;
+}
+
+.message:hover .reply-btn {
+    opacity: 1;
+    color: #aaa;
+}
+
+#replyPreview {
+    display: none;
+
+    position: relative;
+
+    margin: 0 10px 6px 10px;
+    padding: 8px 42px 8px 11px;
+
+    background: rgba(45,140,255,0.12);
+
+    border-left: 3px solid #2d8cff;
+    border-radius: 7px;
+
+    color: #ccc;
+
+    font-size: 13px;
+}
+
+#replyPreview.visible {
+    display: block;
+}
+
+#replyPreview strong {
+    color: #8fd3ff;
+}
+
+#cancelReply {
+    position: absolute;
+
+    right: 6px;
+    top: 50%;
+
+    transform: translateY(-50%);
+
+    padding: 3px 8px;
+
+    min-height: 28px;
+
+    background: transparent;
+
+    color: #aaa;
+
+    font-size: 16px;
+}
+
+/* A replied-to message remains compact */
+
+.reply-quote {
+    margin-bottom: 6px;
+    padding: 5px 8px;
+
+    background: rgba(255,255,255,0.055);
+
+    border-left: 3px solid #777;
+    border-radius: 4px;
+
+    color: #aaa;
+
+    font-size: 13px;
+}
+
+/* Day dividers */
+
+.date-separator {
+    display: flex;
+
+    align-items: center;
+    gap: 10px;
+
+    margin: 14px 4px;
+
+    color: #777;
+
+    font-size: 12px;
+    font-weight: bold;
+
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+}
+
+.date-separator::before,
+.date-separator::after {
+    content: "";
+
+    flex: 1;
+
+    height: 1px;
+
+    background: rgba(255,255,255,0.09);
+}
+
+/* Normal links */
+
+.message .text a {
+    color: #78bfff;
+    text-decoration: underline;
+    text-underline-offset: 2px;
+}
+
+/* Preserve intentional new lines in normal messages */
+
+.message .text {
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+}
+
+/* Appears only while user is reading older messages */
+
+#newMessageIndicator {
+    display: none;
+
+    position: fixed;
+
+    right: 18px;
+    bottom: 86px;
+
+    z-index: 9000;
+
+    width: auto;
+    min-height: 38px;
+
+    padding: 7px 13px;
+
+    border-radius: 20px;
+
+    background: #2d8cff;
+    color: white;
+
+    box-shadow: 0 5px 18px rgba(0,0,0,0.4);
+
+    font-size: 14px;
+
+    cursor: pointer;
+}
+
+#newMessageIndicator.visible {
+    display: block;
+}
+
+
+@media (max-width: 700px) {
+
+    .reply-btn {
+        opacity: 0.75;
+        padding: 5px 7px;
+    }
+
+    #newMessageIndicator {
+        right: 10px;
+        bottom: 94px;
+    }
+
+    #attachmentPreview img,
+    #attachmentPreview video {
+        width: 58px;
+        height: 46px;
+    }
+}
+
+</style>
+</head>
+
+<!-- ===================================================== -->
+<!-- MAIN CHAT CONTAINER -->
+<!-- ===================================================== -->
+
+<body>
+
+<!-- ===================================================== -->
+<!-- SERVER RENDERED CHAT HISTORY -->
+<!-- Flask/Jinja initial page load -->
+<!-- ===================================================== -->
+
+<div class="container">
+
+    <div class="messages" id="messages">
+    <div id="messageContent">
+        {% for msg in messages %}
+        <div class="message">
+
+<div class="message-header">
+
+    <div class="message-header-left">
+
+        <span class="name">
+
+            {{ msg.name }}
+
+        </span>
+
+        <span class="time">
+
+            {{ msg.time }}
+
+        </span>
+
+    </div>
+
+<button
+    type="button"
+    class="delete-btn"
+    data-author="{{ msg.name | e }}"
+    style="display:none;"
+
+    onclick="
+event.preventDefault();
+event.stopPropagation();
+
+deleteMessage(
+{{ loop.index0 }}
+);
+
+return false;
+">
+
+Delete ✕
+
+</button>
+
+</div>
+
+{% if msg.text %}
+
+<!-- ===================================================== -->
+<!-- YOUTUBE LINK DETECTION -->
+<!-- Converts pasted links into thumbnails -->
+<!-- ===================================================== -->
+
+{% if
+    "youtube.com/watch?v=" in msg.text
+    or "youtu.be/" in msg.text
+    or "youtube.com/shorts/" in msg.text
+%}
+
+    {% if "youtube.com/watch?v=" in msg.text %}
+
+        {% set video_id =
+            msg.text.split("v=")[-1].split("&")[0]
+        %}
+
+    {% elif "youtube.com/shorts/" in msg.text %}
+
+        {% set video_id =
+            msg.text.split("/shorts/")[-1].split("?")[0]
+        %}
+
+    {% else %}
+
+        {% set video_id =
+            msg.text.split("/")[-1]
+        %}
+
+    {% endif %}
+
+<div
+    class="youtube-thumb"
+    onclick="openYouTube('{{ video_id }}')"
+>
+
+    <img
+        src="https://img.youtube.com/vi/{{ video_id }}/hqdefault.jpg"
+        alt="YouTube Thumbnail"
+    >
+
+    <div class="youtube-play">
+        ▶
+    </div>
+
+</div>
+
+    {% elif ".mp4" in msg.text or ".webm" in msg.text or ".mov" in msg.text %}
+
+        <div class="text">
+            {{ msg.text }}
+        </div>
+
+        <video controls>
+            <source src="{{ msg.text }}">
+        </video>
+
+    {% else %}
+
+        <div class="text">{{ msg.text }}</div>
+
+    {% endif %}
+
+{% endif %}
+
+<!-- ===================================================== -->
+<!-- IMAGE / VIDEO DISPLAY -->
+<!-- Upload previews + expiration warnings -->
+<!-- ===================================================== -->
+
+{% if msg.upload_url %}
+
+    {% if msg.upload_type == "image" %}
+
+<img
+    src="{{ msg.upload_url }}"
+    class="chat-media"
+    onclick="
+        event.stopPropagation();
+        openMedia(
+            '{{ msg.upload_url }}',
+            'image'
+        )
+    "
+    onerror="
+        this.style.display='none';
+        this.nextElementSibling.style.display='none';
+        this.nextElementSibling.nextElementSibling.style.display='block';
+    "
+>
+        <div class="media-note">
+            📷 Image will expire in one month. Press and hold on phones/tablets, or right-click on computers, to save.
+        </div>
+
+        <div class="expired-media" style="display:none;">
+            📷 Image expired
+        </div>
+
+    {% elif msg.upload_type == "video" %}
+
+<video
+    src="{{ msg.upload_url }}"
+    class="chat-media"
+    controls
+    preload="metadata"
+    playsinline
+
+    onclick="
+        event.stopPropagation();
+        openMedia(
+            '{{ msg.upload_url }}',
+            'video'
+        );
+    "
+
+    onerror="
+        this.style.display='none';
+        this.nextElementSibling.style.display='none';
+        this.nextElementSibling.nextElementSibling.style.display='block';
+    "
+
+></video>
+
+        <div class="media-note">
+            🎥 Video will expire in one month. Press and hold on phones/tablets, or right-click on computers, to save.
+        </div>
+
+        <div class="expired-media" style="display:none;">
+            🎥 Video expired
+        </div>
+
+    {% endif %}
+
+{% endif %}
+
+        </div>
+        {% endfor %}
+
+    </div>
+        <div id="bottomAnchor"></div>
+    </div>
+
+<!-- ===================================================== -->
+<!-- CHAT INPUT AREA -->
+<!-- Name / Message / Upload / Emoji -->
+<!-- ===================================================== -->
+
+    <form
+        id="messageForm"
+        method="POST"
+        enctype="multipart/form-data">
+        <input type="text" id="nameInput"  name="name" placeholder="Name">
+
+<div class="message-row">
+
+    <textarea
+        id="messageInput"
+        name="message"
+        placeholder="Message"
+        rows="1"
+    ></textarea>
+
+    <button type="button" id="emojiBtn">😀</button>
+
+</div>
+
+<label class="file-upload">
+    📷 Photo/Video
+    <input
+        type="file"
+        name="file"
+        id="fileInput"
+    >
+</label>
+
+<span id="selectedFileName"></span>
+        <button type="submit">Send</button>
+
+<div id="emojiPicker">
+    <span>😀</span>
+    <span>😁</span>
+    <span>😂</span>
+    <span>🤣</span>
+    <span>😊</span>
+    <span>😍</span>
+    <span>😎</span>
+    <span>🤔</span>
+    <span>😭</span>
+    <span>😡</span>
+    <span>👍</span>
+    <span>👎</span>
+    <span>👏</span>
+    <span>🙌</span>
+    <span>❤️</span>
+    <span>🎉</span>
+    <span>🍕</span>
+    <span>☕</span>
+    <span>🐶</span>
+    <span>🐱</span>
+</div>
+
+    </form>
+
+</div>
+
+<div id="videoModal" class="video-modal">
+
+    <button
+        type="button"
+        class="youtube-close"
+        onclick="closeYouTube()">
+        ✖ Close
+    </button>
+
+    <div
+        id="videoFrame"
+        style="width:100%; height:100%;">
+    </div>
+
+</div>
+
+<div id="mediaOverlay">
+
+    <div id="mediaControls">
+
+        <button
+            type="button"
+            class="media-control close"
+            onclick="closeMedia()">
+            ✖ Close
+        </button>
+
+    </div>
+
+    <div id="mediaContainer"></div>
+
+</div>
+
+
+<script>
+/* =========================================================
+   SKYFAM PARENT DASHBOARD ORIGIN
+   ========================================================= */
+
+const SKYFAM_DASHBOARD_ORIGIN =
+    `${window.location.protocol}//${window.location.hostname}:5000`;
+
+</script>
+
+<script>
+/* =========================================================
+   SEND-SIDE CHIME FLAG
+
+   Do NOT delay the message submission.
+   The next page load handles the actual chime.
+   ========================================================= */
+
+document.addEventListener(
+    "DOMContentLoaded",
+    () => {
+
+        const form =
+            document.getElementById(
+                "messageForm"
+            );
+
+        if (!form) {
+            return;
+        }
+
+        form.addEventListener(
+            "submit",
+            () => {
+
+                sessionStorage.setItem(
+                    "familyChatJustSent",
+                    "1"
+                );
+
+            }
+        );
+
+    }
+);
+</script>
+
+<!-- ===================================================== -->
+<!-- LIVE MESSAGE APPEND SYSTEM -->
+<!--                                                     -->
+<!-- Append-only architecture                            -->
+<!-- Avoids flashy full refreshes                        -->
+<!--                                                     -->
+<!-- Uses lastSeen tracking                              -->
+<!-- instead of message counts                           -->
+<!--                                                     -->
+<!-- Deletes broke count sync                            -->
+<!-- ===================================================== -->
+
+<script>
+async function refreshMessages() {
+
+    try {
+
+        const response =
+            await fetch("/messages_json");
+
+        const messagesData =
+            await response.json();
+
+        const currentMessages =
+            document.getElementById(
+                "messageContent"
+            );
+
+        currentMessages.style
+            .overflowAnchor =
+            "none";
+
+// IMPORTANT:
+//
+// Track newest seen message
+// instead of message count
+//
+// Delete operations broke
+// count-based tracking
+//
+// lastSeen prevents
+// skipped messages
+
+const lastSeen =
+
+    currentMessages.dataset.lastSeen ||
+    "";
+
+let startIndex = 0;
+
+if (lastSeen) {
+
+const parsedLastSeen =
+
+    JSON.parse(lastSeen);
+
+const found =
+
+    messagesData.findIndex(
+
+        msg =>
+
+            msg.name ===
+            parsedLastSeen.name &&
+
+            msg.time ===
+            parsedLastSeen.time &&
+
+            (msg.text || "") ===
+            parsedLastSeen.text
+
+    );
+
+    if (found >= 0) {
+
+        startIndex =
+            found + 1;
+
+    }
+
+}
+
+const newOnly =
+
+    messagesData.slice(
+        startIndex
+    );
+
+
+if (
+    newOnly.length === 0
+) {
+
+    return;
+
+}
+
+        for (const msg of newOnly) {
+            const realIndex =
+    messagesData.indexOf(msg);
+
+            const div =
+                document.createElement("div");
+
+            div.className =
+                "message";
+
+            let media = "";
+
+            if (
+                msg.upload_type ===
+                "image"
+            ) {
+
+media =
+`<img
+src="${msg.upload_url}"
+class="chat-media"
+onclick="
+openMedia(
+'${msg.upload_url}',
+'image'
+)
+"
+>`;
+            }
+
+            if (
+                msg.upload_type ===
+                "video"
+            ) {
+
+media =
+`<video
+src="${msg.upload_url}"
+class="chat-media"
+controls
+preload="metadata"
+playsinline
+onclick="
+event.preventDefault();
+event.stopPropagation();
+
+openMedia(
+'${msg.upload_url}',
+'video'
+);
+
+return false;
+"
+>
+</video>`;
+            }
+
+let textContent =
+
+msg.text || "";
+
+const ytMatch =
+
+textContent.match(
+
+/(?:youtube\.com\/watch\?v=|youtu\.be\/)([^&\s]+)/
+
+);
+
+if (ytMatch) {
+
+const videoId =
+
+ytMatch[1];
+
+textContent =
+
+`
+<div
+class="youtube-thumb"
+onclick="
+openYouTube(
+'${videoId}'
+)
+"
+>
+
+<img
+src="
+https://img.youtube.com/vi/${videoId}/hqdefault.jpg
+"
+alt="YouTube Thumbnail"
+>
+
+<div
+class="youtube-play"
+>
+
+▶
+
+</div>
+
+</div>
+
+`;
+
+}
+
+div.innerHTML =
+
+`
+<div class="message-header">
+
+<div>
+
+<span class="name">
+${msg.name}
+</span>
+
+<span class="time">
+ — ${msg.time}
+</span>
+
+</div>
+
+<button
+class="delete-btn"
+style="display:none;"
+onclick="
+deleteMessage(
+${realIndex}
+)
+"
+>
+
+Delete X
+
+</button>
+
+</div>
+
+<div class="text">
+
+${textContent}
+
+</div>
+
+${media}
+`;
+
+const newDeleteButton =
+    div.querySelector(
+        ".delete-btn"
+    );
+
+if (newDeleteButton) {
+
+    newDeleteButton.dataset.author =
+        msg.name || "";
+
+}
+
+currentMessages
+    .appendChild(div);
+
+updateDeleteButtonVisibility();
+
+// IMPORTANT:
+//
+// Media loads dimensions AFTER append
+//
+// Re-scroll after metadata loads
+// so recipient lands at bottom
+
+const mediaElement =
+
+    div.querySelector(
+        "img, video"
+    );
+
+if (mediaElement) {
+
+const fixScroll = () => {
+
+    const overlay =
+
+        document.getElementById(
+            "mediaOverlay"
+        );
+
+    if (
+
+        overlay &&
+
+        overlay.style.display ===
+        "flex"
+
+    ) {
+
+        return;
+
+    }
+
+    setTimeout(() => {
+
+        messages.scrollTop =
+            messages.scrollHeight;
+
+    }, 150);
+
+};
+
+    mediaElement.addEventListener(
+
+        "load",
+
+        fixScroll
+
+    );
+
+    mediaElement.addEventListener(
+
+        "loadeddata",
+
+        fixScroll
+
+    );
+
+    mediaElement.addEventListener(
+
+        "loadedmetadata",
+
+        fixScroll
+
+    );
+
+}
+
+}
+
+if (
+
+    messagesData.length >
+
+    0
+
+) {
+
+    currentMessages.dataset.lastSeen =
+
+        JSON.stringify(
+
+            messagesData[
+                messagesData.length - 1
+            ]
+
+        );
+
+}
+
+// ===============================================================================
+        // NOTIFICATION CHIME SYSTEM
+        // New messages use shared 15-minute chime routine
+        // ===============================================================================
+        playFamilyChatChime();
+
+if (
+
+    !newOnly.some(
+
+        msg =>
+
+            msg.upload_type ===
+            "image"
+
+            ||
+
+            msg.upload_type ===
+            "video"
+
+    )
+
+) {
+
+    scrollToBottom();
+
+}
+    }
+
+    catch (err) {
+
+        console.log(
+            "Refresh failed:",
+            err
+        );
+
+    }
+
+}
+
+{% if messages %}
+document.getElementById("messageContent").dataset.lastSeen =
+    JSON.stringify(
+        {{ messages[-1] | tojson }}
+    );
+{% endif %}
+
+setInterval(
+    refreshMessages,
+    5000
+);
+</script>
+
+<script>
+/* =========================================================
+   FAMILY CHAT DELETE BUTTON VISIBILITY
+
+   Trust-based model:
+   - Message author may delete their own message
+   - Silver may delete any message
+   - Everyone else sees no Delete button
+
+   Backend authorization remains unchanged.
+   ========================================================= */
+
+function canDeleteFamilyChatMessage(
+    authorName
+) {
+
+    const currentName =
+        (
+            localStorage.getItem(
+                "familyChatName"
+            ) || ""
+        ).trim();
+
+    const author =
+        String(
+            authorName || ""
+        ).trim();
+
+    if (currentName === "Silver") {
+        return true;
+    }
+
+    return (
+        currentName !== "" &&
+        currentName === author
+    );
+}
+
+
+function updateDeleteButtonVisibility() {
+
+    document.querySelectorAll(
+        ".delete-btn"
+    ).forEach(
+        button => {
+
+            const author =
+                button.dataset.author ||
+                "";
+
+            button.style.display =
+                canDeleteFamilyChatMessage(
+                    author
+                )
+                    ? ""
+                    : "none";
+
+        }
+    );
+
+}
+</script>
+
+
+<!-- ===================================================== -->
+<!-- NAME MEMORY -->
+<!-- Save name locally -->
+<!-- browser localStorage -->
+<!-- ===================================================== -->
+
+<script>
+// Restore saved name
+const nameInput = document.getElementById("nameInput");
+
+const savedName = localStorage.getItem("familyChatName");
+
+if (savedName) {
+    nameInput.value = savedName;
+}
+
+updateDeleteButtonVisibility();
+
+// Save whenever changed
+nameInput.addEventListener("change", () => {
+
+    localStorage.setItem(
+        "familyChatName",
+        nameInput.value
+    );
+
+    updateDeleteButtonVisibility();
+
+});
+</script>
+
+<!-- ===================================================== -->
+<!-- EMOJI PICKER -->
+<!-- ===================================================== -->
+
+<script>
+const emojiBtn = document.getElementById("emojiBtn");
+const emojiPicker = document.getElementById("emojiPicker");
+const messageInput = document.getElementById("messageInput");
+
+emojiBtn.addEventListener("click", () => {
+
+    emojiPicker.style.display =
+        emojiPicker.style.display === "block"
+            ? "none"
+            : "block";
+});
+
+emojiPicker.addEventListener("click", (e) => {
+
+    const emoji = e.target.textContent.trim();
+
+    if (emoji.length <= 2) {
+
+        messageInput.value += emoji;
+
+if (window.innerWidth > 700) {
+
+    messageInput.focus();
+
+}
+
+        emojiPicker.style.display = "none";
+    }
+});
+
+</script>
+
+<!-- ===================================================== -->
+<!-- AUTO SCROLL SYSTEM -->
+<!-- Pause scrolling while user reads -->
+<!-- old messages -->
+<!-- ===================================================== -->
+
+<script>
+let pauseAutoScrollUntil = 0;
+let autoScrollTimer = null;
+
+const messages =
+    document.getElementById("messages");
+
+messages.addEventListener("scroll", () => {
+
+    const nearBottom =
+        messages.scrollHeight -
+        messages.scrollTop -
+        messages.clientHeight < 500;
+
+if (!nearBottom) {
+
+    pauseAutoScrollUntil =
+        Date.now() + 30000;
+
+    clearTimeout(autoScrollTimer);
+
+    autoScrollTimer = setTimeout(() => {
+
+        if (
+
+            Date.now() <
+            pauseAutoScrollUntil
+
+        ) {
+
+            return;
+
+        }
+
+        scrollToBottom();
+
+    }, 30000);
+
+}
+});
+
+function scrollToBottom(force = false) {
+
+    const now = Date.now();
+
+    if (
+        !force &&
+        now < pauseAutoScrollUntil
+    ) {
+        return;
+    }
+
+    messages.scrollTop =
+        messages.scrollHeight;
+}
+
+window.addEventListener("load", () => {
+
+    scrollToBottom(true);
+
+    
+
+});
+</script>
+
+<!-- ===================================================== -->
+<!-- DELETE SYSTEM -->
+<!-- Flask endpoint: -->
+<!-- /delete_message -->
+<!-- -->
+<!-- Uses name validation -->
+<!-- ===================================================== -->
+
+<script>
+
+
+let skyfamToastTimer;
+
+function showToast(message) {
+    const toast = document.getElementById("skyfamToast");
+
+    if (!toast) {
+        return;
+    }
+
+    toast.textContent = message;
+    toast.classList.add("show");
+
+    clearTimeout(skyfamToastTimer);
+
+    skyfamToastTimer = setTimeout(() => {
+        toast.classList.remove("show");
+    }, 3000);
+}
+
+async function deleteMessage(index) {
+    const confirmed = true;
+    const name = localStorage.getItem("familyChatName") || "";
+
+    try {
+        const response = await fetch("/delete_message", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                index: index,
+                name: name
+            })
+        });
+
+        const result = await response.json();
+
+        if (!response.ok) {
+            showToast(result.error || "You can only delete your own messages.");
+            return;
+        }
+
+        location.reload();
+
+    } catch (err) {
+        console.log(err);
+        showToast("Unable to delete that message.");
+    }
+}
+</script>
+
+<script>
+
+let bubbleShooterActive =
+    false;
+
+let stationManagementOpen =
+    false;
+
+let familyChatFocusPaused =
+    false;
+
+window.addEventListener(
+    "message",
+    (event) => {
+
+        if (
+            event.origin !==
+            SKYFAM_DASHBOARD_ORIGIN
+        ) {
+            return;
+        }
+
+        if (
+            typeof event.data
+                .bubbleShooterActive !==
+            "undefined"
+        ) {
+
+            bubbleShooterActive =
+                event.data
+                    .bubbleShooterActive;
+
+        }
+
+        if (
+            typeof event.data
+                .stationManagementOpen !==
+            "undefined"
+        ) {
+
+            stationManagementOpen =
+                event.data
+                    .stationManagementOpen;
+
+        }
+
+
+        if (
+            typeof event.data
+                .familyChatFocusPause !==
+            "undefined"
+        ) {
+
+            familyChatFocusPaused =
+                event.data
+                    .familyChatFocusPause;
+
+            console.log(
+                "FamilyChat autofocus pause:",
+                familyChatFocusPaused
+            );
+
+        }
+
+    }
+);
+
+window.addEventListener("load", () => {
+
+    const savedName =
+        localStorage.getItem("familyChatName");
+
+    if (!savedName) return;
+
+    setInterval(() => {
+
+        const messageInput =
+            document.getElementById("messageInput");
+
+        const active =
+            document.activeElement;
+
+        // Don't interrupt editing name field
+        if (
+            active &&
+            active.id === "nameInput"
+        ) {
+            return;
+        }
+
+        if (messageInput) {
+if (
+
+    window.innerWidth > 700 &&
+
+    document.activeElement !==
+    messageInput
+
+) {
+
+if (
+    document.visibilityState ===
+    "visible"
+) {
+
+if (
+    bubbleShooterActive ||
+    stationManagementOpen ||
+    familyChatFocusPaused
+) {
+    return;
+}
+
+    messageInput.focus();
+
+}
+
+}
+        }
+
+    }, 5000);
+
+});
+</script>
+
+<!-- ===================================================== -->
+<!-- YOUTUBE OVERLAY PLAYER -->
+<!-- ===================================================== -->
+
+<script>
+
+window.familyChatYouTubePlayer = null;
+
+let pendingFamilyChatVideoId = null;
+
+
+/* =========================================================
+   YOUTUBE IFRAME API READY
+   ========================================================= */
+
+function onYouTubeIframeAPIReady() {
+
+    window.familyChatYouTubePlayer =
+        new YT.Player(
+            "videoFrame",
+            {
+                width: "100%",
+                height: "100%",
+
+                playerVars: {
+                    autoplay: 0,
+                    controls: 1,
+                    fs: 0,
+                    rel: 0,
+                    playsinline: 1
+                },
+
+                events: {
+
+                    onReady: event => {
+
+                        /*
+                         * Explicitly allow autoplay on the
+                         * iframe generated by YouTube's API.
+                         */
+                        const iframe =
+                            event.target.getIframe();
+
+                        if (iframe) {
+                            iframe.setAttribute(
+                                "allow",
+                                "autoplay; encrypted-media; picture-in-picture"
+                            );
+                        }
+
+                        if (
+                            pendingFamilyChatVideoId
+                        ) {
+
+                            event.target.loadVideoById(
+                                pendingFamilyChatVideoId
+                            );
+
+                            event.target.playVideo();
+
+                            pendingFamilyChatVideoId =
+                                null;
+
+                        }
+
+                    },
+
+                    onStateChange: event => {
+
+                        if (
+                            event.data ===
+                            YT.PlayerState.PLAYING
+                        ) {
+
+                            window.parent.postMessage(
+                                {
+                                    action:
+                                        "familyChatMediaStarted"
+                                },
+                                SKYFAM_DASHBOARD_ORIGIN
+                            );
+
+                        }
+
+                    }
+
+                }
+            }
+        );
+
+}
+
+
+/* =========================================================
+   OPEN YOUTUBE
+   ========================================================= */
+
+function openYouTube(videoId) {
+
+    const modal =
+        document.getElementById(
+            "videoModal"
+        );
+
+    modal.style.display =
+        "block";
+
+    /*
+     * The user has explicitly chosen Chat media.
+     * Pause Radio/YallBot immediately rather than
+     * waiting for YouTube to finish loading.
+     */
+    window.parent.postMessage(
+        {
+            action:
+                "familyChatMediaStarted"
+        },
+        SKYFAM_DASHBOARD_ORIGIN
+    );
+
+    pendingFamilyChatVideoId =
+        videoId;
+
+    if (
+        window.familyChatYouTubePlayer &&
+        typeof window.familyChatYouTubePlayer
+            .loadVideoById ===
+            "function"
+    ) {
+
+        window.familyChatYouTubePlayer
+            .loadVideoById(
+                videoId
+            );
+
+        window.familyChatYouTubePlayer
+            .playVideo();
+
+        pendingFamilyChatVideoId =
+            null;
+
+    }
+
+}
+
+
+/* =========================================================
+   CLOSE YOUTUBE
+   ========================================================= */
+
+function closeYouTube() {
+
+    const modal =
+        document.getElementById(
+            "videoModal"
+        );
+
+    if (
+        window.familyChatYouTubePlayer &&
+        typeof window.familyChatYouTubePlayer
+            .stopVideo ===
+            "function"
+    ) {
+
+        window.familyChatYouTubePlayer
+            .stopVideo();
+
+    }
+
+    pendingFamilyChatVideoId =
+        null;
+
+    modal.style.display =
+        "none";
+
+}
+</script>
+
+<!-- ===================================================== -->
+<!-- FULLSCREEN IMAGE / VIDEO VIEWER -->
+<!-- ===================================================== -->
+
+<script>
+
+function openMedia(src, type) {
+
+    const overlay =
+        document.getElementById("mediaOverlay");
+
+    const container =
+        document.getElementById("mediaContainer");
+
+    container.innerHTML = "";
+
+    if (type === "image") {
+
+        container.innerHTML =
+            `<img src="${src}">`;
+
+    } else {
+
+container.innerHTML =
+`
+<video
+src="${src}"
+controls
+autoplay
+playsinline
+webkit-playsinline
+></video>
+`;
+
+    }
+
+    overlay.style.display = "flex";
+
+    // Click dark background to close
+    overlay.onclick = (e) => {
+
+        if (e.target === overlay) {
+            closeMedia();
+        }
+    };
+}
+
+function closeMedia() {
+
+    const overlay =
+
+        document.getElementById(
+            "mediaOverlay"
+        );
+
+    const container =
+
+        document.getElementById(
+            "mediaContainer"
+        );
+
+    const video =
+
+        container.querySelector(
+            "video"
+        );
+
+    if (video) {
+
+        video.pause();
+
+        video.removeAttribute(
+            "src"
+        );
+
+        video.load();
+
+    }
+
+    overlay.style.display =
+        "none";
+
+    container.innerHTML =
+        "";
+
+    setTimeout(() => {
+
+        scrollToBottom();
+
+    }, 1500);
+
+}
+
+/* =========================================================
+   FAMILYCHAT AUDIO COORDINATION
+   ========================================================= */
+
+function pauseFamilyChatMedia() {
+
+    document.querySelectorAll(
+        "video"
+    ).forEach(
+        video => {
+
+            if (!video.paused) {
+                video.pause();
+            }
+
+        }
+    );
+
+    /*
+     * A regular YouTube iframe cannot be reliably paused
+     * without using the YouTube API, so stop/close it.
+     */
+    const youtubeModal =
+        document.getElementById(
+            "videoModal"
+        );
+
+    if (
+        youtubeModal &&
+        youtubeModal.style.display ===
+            "block"
+    ) {
+
+        if (
+            window.familyChatYouTubePlayer &&
+            typeof window.familyChatYouTubePlayer
+                .stopVideo ===
+                "function"
+        ) {
+
+            window.familyChatYouTubePlayer
+                .stopVideo();
+
+        }
+
+        youtubeModal.style.display =
+            "none";
+
+    }
+
+}
+
+
+/*
+ * Capturing listener catches play events from:
+ * - uploaded videos
+ * - dynamically-added videos
+ * - media overlay videos
+ * - ordinary inline video messages
+ */
+document.addEventListener(
+    "play",
+    event => {
+
+        if (
+            !event.target ||
+            event.target.tagName !==
+                "VIDEO"
+        ) {
+            return;
+        }
+
+        window.parent.postMessage(
+            {
+                action:
+                    "familyChatMediaStarted"
+            },
+            SKYFAM_DASHBOARD_ORIGIN
+        );
+
+    },
+    true
+);
+
+
+/*
+ * Dashboard tells FamilyChat to give up audio
+ * when Radio/YallBot begins playing.
+ */
+window.addEventListener(
+    "message",
+    event => {
+
+        if (
+            event.origin !==
+            SKYFAM_DASHBOARD_ORIGIN
+        ) {
+            return;
+        }
+
+        if (
+            event.data &&
+            event.data.action ===
+                "pauseFamilyChatMedia"
+        ) {
+
+            pauseFamilyChatMedia();
+
+        }
+
+    }
+);
+
+
+async function toggleMediaFullscreen() {
+
+    const overlay =
+        document.getElementById(
+            "mediaOverlay"
+        );
+
+    try {
+
+        if (!document.fullscreenElement) {
+
+            if (overlay.requestFullscreen) {
+
+                await overlay.requestFullscreen();
+
+            } else if (
+                overlay.webkitRequestFullscreen
+            ) {
+
+                overlay.webkitRequestFullscreen();
+
+            }
+
+        } else {
+
+            if (document.exitFullscreen) {
+
+                await document.exitFullscreen();
+
+            } else if (
+                document.webkitExitFullscreen
+            ) {
+
+                document.webkitExitFullscreen();
+
+            }
+
+        }
+
+    } catch (error) {
+
+        console.error(
+            "Media fullscreen failed:",
+            error
+        );
+
+    }
+}
+
+
+document.addEventListener(
+    "fullscreenchange",
+    () => {
+
+        const button =
+            document.getElementById(
+                "fullscreenMedia"
+            );
+
+        if (!button) return;
+
+        button.innerHTML =
+
+            document.fullscreenElement
+
+                ? "← Return"
+
+                : "⛶ Fullscreen";
+
+    }
+);
+
+</script>
+
+<!-- ===================================================== -->
+<!-- FILE PICKER DISPLAY -->
+<!-- Shows chosen filename before upload -->
+<!-- ===================================================== -->
+
+<script>
+
+const fileInput =
+    document.getElementById("fileInput");
+
+const selectedFileName =
+    document.getElementById("selectedFileName");
+
+if (fileInput) {
+
+    fileInput.addEventListener("change", () => {
+
+        if (
+            fileInput.files &&
+            fileInput.files.length > 0
+        ) {
+
+            selectedFileName.textContent =
+                fileInput.files[0].name;
+
+        } else {
+
+            selectedFileName.textContent = "";
+        }
+    });
+}
+
+
+/* =========================================================
+   CLIPBOARD IMAGE PASTE
+   Allows screenshots copied to the clipboard to be attached
+   with Ctrl+V directly inside FamilyChat.
+   ========================================================= */
+
+document.addEventListener(
+    "paste",
+    (event) => {
+
+        if (
+            !event.clipboardData ||
+            !event.clipboardData.items
+        ) {
+            return;
+        }
+
+        let imageBlob = null;
+
+        for (
+            const item of event.clipboardData.items
+        ) {
+
+            if (
+                item.kind === "file" &&
+                item.type.startsWith("image/")
+            ) {
+
+                imageBlob =
+                    item.getAsFile();
+
+                break;
+            }
+        }
+
+        if (!imageBlob) {
+            return;
+        }
+
+        event.preventDefault();
+
+        const now =
+            new Date();
+
+        const pad =
+            (value) =>
+                String(value).padStart(2, "0");
+
+        const filename =
+            "Screenshot-" +
+            now.getFullYear() +
+            "-" +
+            pad(now.getMonth() + 1) +
+            "-" +
+            pad(now.getDate()) +
+            "-" +
+            pad(now.getHours()) +
+            pad(now.getMinutes()) +
+            pad(now.getSeconds()) +
+            ".png";
+
+        const screenshotFile =
+            new File(
+                [imageBlob],
+                filename,
+                {
+                    type:
+                        imageBlob.type ||
+                        "image/png"
+                }
+            );
+
+        const transfer =
+            new DataTransfer();
+
+        transfer.items.add(
+            screenshotFile
+        );
+
+        fileInput.files =
+            transfer.files;
+
+        fileInput.dispatchEvent(
+            new Event(
+                "change",
+                {
+                    bubbles: true
+                }
+            )
+        );
+
+        if (selectedFileName) {
+            selectedFileName.textContent =
+                "📋 " + filename;
+        }
+
+        const messageInput =
+            document.getElementById(
+                "messageInput"
+            );
+
+        if (messageInput) {
+            messageInput.focus();
+        }
+    }
+);
+</script>
+
+
+<script>
+/* =========================================================
+   SHARED FAMILYCHAT CHIME
+   Fires on send OR receive
+   Maximum once every 15 minutes per browser
+   ========================================================= */
+
+window.playFamilyChatChime = async function() {
+
+    const now = Date.now();
+
+    const lastHorn =
+        parseInt(
+            localStorage.getItem(
+                "lastAirhorn"
+            ) || "0",
+            10
+        );
+
+    if (
+        lastHorn &&
+        now - lastHorn < 900000
+    ) {
+        return false;
+    }
+
+    const ding =
+        document.getElementById(
+            "notificationSound"
+        );
+
+    if (!ding) {
+        console.log(
+            "FamilyChat chime element not found."
+        );
+
+        return false;
+    }
+
+    try {
+
+        ding.muted = false;
+        ding.volume = 1;
+        ding.currentTime = 0;
+
+        await ding.play();
+
+        localStorage.setItem(
+            "lastAirhorn",
+            String(now)
+        );
+
+        console.log(
+            "FamilyChat chime played."
+        );
+
+        return true;
+
+    } catch (error) {
+
+        console.log(
+            "FamilyChat chime failed:",
+            error
+        );
+
+        return false;
+    }
+};
+</script>
+
+
+<script>
+/* =========================================================
+   POST-SEND CHIME
+
+   Message has already been submitted.
+   Play the chime from the newly loaded page.
+   ========================================================= */
+
+window.addEventListener(
+    "load",
+    async () => {
+
+        const justSent =
+            sessionStorage.getItem(
+                "familyChatJustSent"
+            );
+
+        if (justSent !== "1") {
+            return;
+        }
+
+        sessionStorage.removeItem(
+            "familyChatJustSent"
+        );
+
+        await new Promise(
+            resolve =>
+                setTimeout(
+                    resolve,
+                    150
+                )
+        );
+
+        await playFamilyChatChime();
+
+    }
+);
+</script>
+
+<!-- ===================================================== -->
+<!-- NOTIFICATION SOUND -->
+<!-- ===================================================== -->
+
+<audio id="notificationSound">
+    <source
+        src="/static/chime.mp3"
+        type="audio/mpeg">
+</audio>
+
+
+<script>
+/* =========================================================
+   NOTIFICATION SOUND UNLOCK
+
+   Modern browsers may block programmatic audio until the
+   user has interacted with the page at least once.
+
+   The first click, tap, or key press silently unlocks the
+   existing FamilyChat notification sound.
+   ========================================================= */
+
+(function () {
+
+    const ding =
+        document.getElementById(
+            "notificationSound"
+        );
+
+    if (!ding) {
+        return;
+    }
+
+    let notificationSoundUnlocked =
+        false;
+
+    async function unlockNotificationSound() {
+
+        if (notificationSoundUnlocked) {
+            return;
+        }
+
+        const originalVolume =
+            ding.volume;
+
+        try {
+
+            ding.volume = 0;
+
+            await ding.play();
+
+            ding.pause();
+            ding.currentTime = 0;
+
+            ding.volume =
+                originalVolume;
+
+            notificationSoundUnlocked =
+                true;
+
+            console.log(
+                "FamilyChat notification sound unlocked."
+            );
+
+        } catch (error) {
+
+            ding.volume =
+                originalVolume;
+
+            console.log(
+                "Notification sound still blocked:",
+                error
+            );
+
+        }
+
+    }
+
+    window.addEventListener(
+        "pointerdown",
+        unlockNotificationSound
+    );
+
+    window.addEventListener(
+        "keydown",
+        unlockNotificationSound
+    );
+
+    window.addEventListener(
+        "touchstart",
+        unlockNotificationSound,
+        {
+            passive: true
+        }
+    );
+
+})();
+</script>
+
+
+
+<div id="skyfamToast" class="skyfam-toast" role="status" aria-live="polite"></div>
+
+
+<script>
+/* =========================================================
+   FAMILYCHAT YOUTUBE IFRAME API
+   ========================================================= */
+
+(function () {
+
+    if (
+        document.querySelector(
+            'script[src="https://www.youtube.com/iframe_api"]'
+        )
+    ) {
+        return;
+    }
+
+    const tag =
+        document.createElement(
+            "script"
+        );
+
+    tag.src =
+        "https://www.youtube.com/iframe_api";
+
+    document.head.appendChild(
+        tag
+    );
+
+})();
+</script>
+
+
+<script>
+/* =========================================================
+   FAMILYCHAT MODERN UX
+
+   - attachment preview/remove
+   - drag/drop
+   - multiline Enter/Shift+Enter
+   - contextual Reply
+   - date separators
+   - safe linkification
+   - new-message indicator
+   ========================================================= */
+
+(() => {
+
+    const fcForm =
+        document.getElementById(
+            "messageForm"
+        );
+
+    const fcMessageInput =
+        document.getElementById(
+            "messageInput"
+        );
+
+    const fcFileInput =
+        document.getElementById(
+            "fileInput"
+        );
+
+    const fcMessages =
+        document.getElementById(
+            "messages"
+        );
+
+    const fcMessageContent =
+        document.getElementById(
+            "messageContent"
+        );
+
+    if (
+        !fcForm ||
+        !fcMessageInput ||
+        !fcFileInput ||
+        !fcMessages ||
+        !fcMessageContent
+    ) {
+        console.warn(
+            "FamilyChat modern UX: required elements missing."
+        );
+
+        return;
+    }
+
+
+    /* =====================================================
+       CREATE CONTEXTUAL UI
+       ===================================================== */
+
+    const attachmentPreview =
+        document.createElement("div");
+
+    attachmentPreview.id =
+        "attachmentPreview";
+
+    attachmentPreview.innerHTML =
+        `
+        <div id="attachmentPreviewMedia"></div>
+
+        <div id="attachmentPreviewInfo">
+            <div id="attachmentPreviewName"></div>
+        </div>
+
+        <button
+            type="button"
+            id="removeAttachment"
+            title="Remove attachment"
+            aria-label="Remove attachment">
+            ✕
+        </button>
+        `;
+
+    fcForm.parentNode.insertBefore(
+        attachmentPreview,
+        fcForm
+    );
+
+
+    const replyPreview =
+        document.createElement("div");
+
+    replyPreview.id =
+        "replyPreview";
+
+    replyPreview.innerHTML =
+        `
+        <div id="replyPreviewText"></div>
+
+        <button
+            type="button"
+            id="cancelReply"
+            title="Cancel reply"
+            aria-label="Cancel reply">
+            ✕
+        </button>
+        `;
+
+    fcForm.parentNode.insertBefore(
+        replyPreview,
+        fcForm
+    );
+
+
+    const dropOverlay =
+        document.createElement("div");
+
+    dropOverlay.id =
+        "dropOverlay";
+
+    dropOverlay.textContent =
+        "Drop photo or video here";
+
+    document.body.appendChild(
+        dropOverlay
+    );
+
+
+    const newMessageIndicator =
+        document.createElement("button");
+
+    newMessageIndicator.type =
+        "button";
+
+    newMessageIndicator.id =
+        "newMessageIndicator";
+
+    document.body.appendChild(
+        newMessageIndicator
+    );
+
+
+    /* =====================================================
+       TEXTAREA AUTO-GROW
+       ===================================================== */
+
+    function resizeMessageBox() {
+
+        fcMessageInput.style.height =
+            "auto";
+
+        const newHeight =
+            Math.min(
+                fcMessageInput.scrollHeight,
+                120
+            );
+
+        fcMessageInput.style.height =
+            Math.max(
+                44,
+                newHeight
+            ) + "px";
+    }
+
+
+    fcMessageInput.addEventListener(
+        "input",
+        resizeMessageBox
+    );
+
+
+    /* =====================================================
+       ENTER SENDS / SHIFT+ENTER NEW LINE
+       Desktop keyboard behavior only.
+       ===================================================== */
+
+    fcMessageInput.addEventListener(
+        "keydown",
+        event => {
+
+            if (
+                event.key !== "Enter" ||
+                event.shiftKey ||
+                event.isComposing
+            ) {
+                return;
+            }
+
+            /*
+             * On narrow/touch layouts, allow the keyboard's
+             * normal behavior. Desktop gets Enter-to-send.
+             */
+            if (
+                window.matchMedia(
+                    "(pointer: coarse)"
+                ).matches
+            ) {
+                return;
+            }
+
+            event.preventDefault();
+
+            if (
+                typeof fcForm.requestSubmit ===
+                "function"
+            ) {
+                fcForm.requestSubmit();
+            } else {
+                fcForm.submit();
+            }
+
+        }
+    );
+
+
+    /* =====================================================
+       ATTACHMENT PREVIEW
+       Existing file picker AND pasted screenshots both
+       dispatch the normal change event.
+       ===================================================== */
+
+    let attachmentObjectUrl = null;
+
+
+    function clearAttachmentObjectUrl() {
+
+        if (attachmentObjectUrl) {
+
+            URL.revokeObjectURL(
+                attachmentObjectUrl
+            );
+
+            attachmentObjectUrl = null;
+        }
+    }
+
+
+    function updateAttachmentPreview() {
+
+        clearAttachmentObjectUrl();
+
+        const mediaBox =
+            document.getElementById(
+                "attachmentPreviewMedia"
+            );
+
+        const nameBox =
+            document.getElementById(
+                "attachmentPreviewName"
+            );
+
+        mediaBox.replaceChildren();
+
+        const file =
+            fcFileInput.files &&
+            fcFileInput.files[0];
+
+        if (!file) {
+
+            attachmentPreview.classList.remove(
+                "visible"
+            );
+
+            nameBox.textContent = "";
+
+            return;
+        }
+
+        attachmentPreview.classList.add(
+            "visible"
+        );
+
+        nameBox.textContent =
+            file.name;
+
+        attachmentObjectUrl =
+            URL.createObjectURL(file);
+
+        if (
+            file.type.startsWith(
+                "image/"
+            )
+        ) {
+
+            const image =
+                document.createElement(
+                    "img"
+                );
+
+            image.src =
+                attachmentObjectUrl;
+
+            image.alt =
+                "Attachment preview";
+
+            mediaBox.appendChild(
+                image
+            );
+
+        } else if (
+            file.type.startsWith(
+                "video/"
+            )
+        ) {
+
+            const video =
+                document.createElement(
+                    "video"
+                );
+
+            video.src =
+                attachmentObjectUrl;
+
+            video.muted = true;
+            video.playsInline = true;
+
+            mediaBox.appendChild(
+                video
+            );
+        }
+    }
+
+
+    fcFileInput.setAttribute(
+        "accept",
+        "image/*,video/*"
+    );
+
+
+    fcFileInput.addEventListener(
+        "change",
+        updateAttachmentPreview
+    );
+
+
+    document.getElementById(
+        "removeAttachment"
+    ).addEventListener(
+        "click",
+        () => {
+
+            const emptyTransfer =
+                new DataTransfer();
+
+            fcFileInput.files =
+                emptyTransfer.files;
+
+            fcFileInput.dispatchEvent(
+                new Event(
+                    "change",
+                    {
+                        bubbles: true
+                    }
+                )
+            );
+
+            /*
+             * Keep the older selected-filename display
+             * synchronized too.
+             */
+            const oldName =
+                document.getElementById(
+                    "selectedFileName"
+                );
+
+            if (oldName) {
+                oldName.textContent = "";
+            }
+
+            fcMessageInput.focus();
+        }
+    );
+
+
+    /* =====================================================
+       DRAG AND DROP
+       ===================================================== */
+
+    let dragDepth = 0;
+
+
+    function containsFiles(event) {
+
+        return (
+            event.dataTransfer &&
+            Array.from(
+                event.dataTransfer.types ||
+                []
+            ).includes("Files")
+        );
+    }
+
+
+    document.addEventListener(
+        "dragenter",
+        event => {
+
+            if (!containsFiles(event)) {
+                return;
+            }
+
+            event.preventDefault();
+
+            dragDepth++;
+
+            dropOverlay.classList.add(
+                "visible"
+            );
+        }
+    );
+
+
+    document.addEventListener(
+        "dragover",
+        event => {
+
+            if (!containsFiles(event)) {
+                return;
+            }
+
+            event.preventDefault();
+        }
+    );
+
+
+    document.addEventListener(
+        "dragleave",
+        event => {
+
+            if (!containsFiles(event)) {
+                return;
+            }
+
+            dragDepth--;
+
+            if (dragDepth <= 0) {
+
+                dragDepth = 0;
+
+                dropOverlay.classList.remove(
+                    "visible"
+                );
+            }
+        }
+    );
+
+
+    document.addEventListener(
+        "drop",
+        event => {
+
+            if (!containsFiles(event)) {
+                return;
+            }
+
+            event.preventDefault();
+
+            dragDepth = 0;
+
+            dropOverlay.classList.remove(
+                "visible"
+            );
+
+            const file =
+                event.dataTransfer.files &&
+                event.dataTransfer.files[0];
+
+            if (!file) {
+                return;
+            }
+
+            if (
+                !file.type.startsWith("image/") &&
+                !file.type.startsWith("video/")
+            ) {
+
+                if (
+                    typeof showToast ===
+                    "function"
+                ) {
+                    showToast(
+                        "Please drop an image or video."
+                    );
+                }
+
+                return;
+            }
+
+            const transfer =
+                new DataTransfer();
+
+            transfer.items.add(file);
+
+            fcFileInput.files =
+                transfer.files;
+
+            fcFileInput.dispatchEvent(
+                new Event(
+                    "change",
+                    {
+                        bubbles: true
+                    }
+                )
+            );
+
+            fcMessageInput.focus();
+        }
+    );
+
+
+    /* =====================================================
+       REPLY
+       No backend/schema change required.
+
+       Reply metadata is stored as the first line of the
+       normal message text, then styled on display.
+       ===================================================== */
+
+    let replyState = null;
+
+
+    function cancelReply() {
+
+        replyState = null;
+
+        replyPreview.classList.remove(
+            "visible"
+        );
+
+        document.getElementById(
+            "replyPreviewText"
+        ).textContent = "";
+    }
+
+
+    document.getElementById(
+        "cancelReply"
+    ).addEventListener(
+        "click",
+        () => {
+
+            cancelReply();
+
+            fcMessageInput.focus();
+        }
+    );
+
+
+    function startReply(messageElement) {
+
+        const nameElement =
+            messageElement.querySelector(
+                ".name"
+            );
+
+        const textElement =
+            messageElement.querySelector(
+                ".text"
+            );
+
+        const author =
+            (
+                nameElement
+                    ? nameElement.textContent
+                    : "Family"
+            ).trim();
+
+        let snippet =
+            (
+                textElement
+                    ? textElement.textContent
+                    : "Attachment"
+            )
+                .replace(/\s+/g, " ")
+                .trim();
+
+        if (!snippet) {
+            snippet = "Attachment";
+        }
+
+        /*
+         * Avoid nesting an entire previous quote.
+         */
+        snippet =
+            snippet.replace(
+                /^↪\s*Reply to.*?:\s*[“"].*?[”"]\s*/i,
+                ""
+            );
+
+        snippet =
+            snippet.slice(
+                0,
+                90
+            );
+
+        replyState = {
+            author,
+            snippet
+        };
+
+        const previewText =
+            document.getElementById(
+                "replyPreviewText"
+            );
+
+        previewText.replaceChildren();
+
+        const strong =
+            document.createElement(
+                "strong"
+            );
+
+        strong.textContent =
+            "Replying to " + author;
+
+        previewText.appendChild(
+            strong
+        );
+
+        previewText.appendChild(
+            document.createElement("br")
+        );
+
+        previewText.appendChild(
+            document.createTextNode(
+                snippet
+            )
+        );
+
+        replyPreview.classList.add(
+            "visible"
+        );
+
+        fcMessageInput.focus();
+    }
+
+
+    fcForm.addEventListener(
+        "submit",
+        () => {
+
+            if (!replyState) {
+                return;
+            }
+
+            const body =
+                fcMessageInput.value.trim();
+
+            const prefix =
+                "↪ Reply to " +
+                replyState.author +
+                ": “" +
+                replyState.snippet +
+                "”";
+
+            fcMessageInput.value =
+                body
+                    ? prefix + "\n" + body
+                    : prefix;
+
+            /*
+             * Form submission continues normally.
+             */
+        }
+    );
+
+
+    /* =====================================================
+       SAFE LINKIFICATION + REPLY DISPLAY
+       ===================================================== */
+
+    const urlPattern =
+        /(https?:\/\/[^\s]+)/g;
+
+
+    function appendLinkifiedText(
+        target,
+        content
+    ) {
+
+        const pieces =
+            content.split(
+                urlPattern
+            );
+
+        for (const piece of pieces) {
+
+            if (
+                /^https?:\/\//i.test(
+                    piece
+                )
+            ) {
+
+                /*
+                 * Leave common trailing punctuation outside
+                 * of the clickable URL.
+                 */
+                const match =
+                    piece.match(
+                        /^(.*?)([.,!?;:]*)$/
+                    );
+
+                const href =
+                    match
+                        ? match[1]
+                        : piece;
+
+                const punctuation =
+                    match
+                        ? match[2]
+                        : "";
+
+                const link =
+                    document.createElement(
+                        "a"
+                    );
+
+                link.href = href;
+
+                link.target =
+                    "_blank";
+
+                link.rel =
+                    "noopener noreferrer";
+
+                link.textContent =
+                    href;
+
+                target.appendChild(
+                    link
+                );
+
+                if (punctuation) {
+
+                    target.appendChild(
+                        document.createTextNode(
+                            punctuation
+                        )
+                    );
+                }
+
+            } else {
+
+                target.appendChild(
+                    document.createTextNode(
+                        piece
+                    )
+                );
+            }
+        }
+    }
+
+
+    function processMessageText(
+        textElement
+    ) {
+
+        if (
+            !textElement ||
+            textElement.dataset.modernProcessed ===
+                "1"
+        ) {
+            return;
+        }
+
+        /*
+         * Don't interfere with YouTube thumbnails or other
+         * deliberately-rendered HTML message content.
+         */
+        if (
+            textElement.querySelector(
+                "img, video, iframe, .youtube-thumb"
+            )
+        ) {
+            textElement.dataset.modernProcessed =
+                "1";
+
+            return;
+        }
+
+        const raw =
+            textElement.textContent || "";
+
+        textElement.replaceChildren();
+
+        const replyMatch =
+            raw.match(
+                /^↪ Reply to (.*?): “(.*?)”(?:\n|$)([\s\S]*)$/
+            );
+
+        let normalText =
+            raw;
+
+        if (replyMatch) {
+
+            const quote =
+                document.createElement(
+                    "div"
+                );
+
+            quote.className =
+                "reply-quote";
+
+            quote.textContent =
+                "↪ " +
+                replyMatch[1] +
+                ": " +
+                replyMatch[2];
+
+            textElement.appendChild(
+                quote
+            );
+
+            normalText =
+                replyMatch[3] || "";
+        }
+
+        appendLinkifiedText(
+            textElement,
+            normalText
+        );
+
+        textElement.dataset.modernProcessed =
+            "1";
+    }
+
+
+    /* =====================================================
+       MESSAGE REPLY BUTTONS
+       ===================================================== */
+
+    function addReplyButton(
+        messageElement
+    ) {
+
+        if (
+            messageElement.querySelector(
+                ".reply-btn"
+            )
+        ) {
+            return;
+        }
+
+        const header =
+            messageElement.querySelector(
+                ".message-header"
+            );
+
+        if (!header) {
+            return;
+        }
+
+        const button =
+            document.createElement(
+                "button"
+            );
+
+        button.type =
+            "button";
+
+        button.className =
+            "reply-btn";
+
+        button.textContent =
+            "Reply";
+
+        button.title =
+            "Reply to this message";
+
+        button.addEventListener(
+            "click",
+            event => {
+
+                event.preventDefault();
+                event.stopPropagation();
+
+                startReply(
+                    messageElement
+                );
+            }
+        );
+
+        /*
+         * Put Reply before Delete if Delete exists.
+         */
+        const deleteButton =
+            header.querySelector(
+                ".delete-btn"
+            );
+
+        if (deleteButton) {
+
+            header.insertBefore(
+                button,
+                deleteButton
+            );
+
+        } else {
+
+            header.appendChild(
+                button
+            );
+        }
+    }
+
+
+    /* =====================================================
+       DATE SEPARATORS
+       Existing stored timestamps omit the year, so the
+       current year is inferred for display.
+       ===================================================== */
+
+    function parseMessageDate(
+        timeText
+    ) {
+
+        if (!timeText) {
+            return null;
+        }
+
+        const currentYear =
+            new Date().getFullYear();
+
+        let parsed =
+            new Date(
+                timeText + " " + currentYear
+            );
+
+        if (
+            Number.isNaN(
+                parsed.getTime()
+            )
+        ) {
+            return null;
+        }
+
+        /*
+         * Around New Year, December messages may belong
+         * to the prior year.
+         */
+        const now =
+            new Date();
+
+        if (
+            parsed.getTime() -
+            now.getTime() >
+            1000 * 60 * 60 * 24 * 30
+        ) {
+
+            parsed =
+                new Date(
+                    timeText +
+                    " " +
+                    (currentYear - 1)
+                );
+        }
+
+        return parsed;
+    }
+
+
+    function dateKey(date) {
+
+        return (
+            date.getFullYear() +
+            "-" +
+            String(
+                date.getMonth() + 1
+            ).padStart(2, "0") +
+            "-" +
+            String(
+                date.getDate()
+            ).padStart(2, "0")
+        );
+    }
+
+
+    function dateLabel(date) {
+
+        const today =
+            new Date();
+
+        today.setHours(
+            0,
+            0,
+            0,
+            0
+        );
+
+        const target =
+            new Date(date);
+
+        target.setHours(
+            0,
+            0,
+            0,
+            0
+        );
+
+        const difference =
+            Math.round(
+                (
+                    today.getTime() -
+                    target.getTime()
+                ) /
+                86400000
+            );
+
+        if (difference === 0) {
+            return "Today";
+        }
+
+        if (difference === 1) {
+            return "Yesterday";
+        }
+
+        return target.toLocaleDateString(
+            undefined,
+            {
+                month: "short",
+                day: "numeric"
+            }
+        );
+    }
+
+
+    function rebuildDateSeparators() {
+
+        fcMessageContent
+            .querySelectorAll(
+                ".date-separator"
+            )
+            .forEach(
+                element =>
+                    element.remove()
+            );
+
+        let previousKey =
+            null;
+
+        const messageElements =
+            Array.from(
+                fcMessageContent.querySelectorAll(
+                    ":scope > .message"
+                )
+            );
+
+        for (
+            const messageElement
+            of messageElements
+        ) {
+
+            const timeElement =
+                messageElement.querySelector(
+                    ".time"
+                );
+
+            const parsed =
+                parseMessageDate(
+                    timeElement
+                        ? timeElement.textContent.trim()
+                        : ""
+                );
+
+            if (!parsed) {
+                continue;
+            }
+
+            const key =
+                dateKey(parsed);
+
+            if (
+                key ===
+                previousKey
+            ) {
+                continue;
+            }
+
+            previousKey =
+                key;
+
+            const separator =
+                document.createElement(
+                    "div"
+                );
+
+            separator.className =
+                "date-separator";
+
+            separator.textContent =
+                dateLabel(parsed);
+
+            fcMessageContent.insertBefore(
+                separator,
+                messageElement
+            );
+        }
+    }
+
+
+    /* =====================================================
+       PROCESS EXISTING/NEW MESSAGES
+       ===================================================== */
+
+    function processMessage(
+        messageElement
+    ) {
+
+        if (
+            !messageElement ||
+            !messageElement.classList.contains(
+                "message"
+            )
+        ) {
+            return;
+        }
+
+        addReplyButton(
+            messageElement
+        );
+
+        processMessageText(
+            messageElement.querySelector(
+                ".text"
+            )
+        );
+    }
+
+
+    fcMessageContent
+        .querySelectorAll(
+            ":scope > .message"
+        )
+        .forEach(
+            processMessage
+        );
+
+    rebuildDateSeparators();
+
+
+    /* =====================================================
+       NEW MESSAGE INDICATOR
+       ===================================================== */
+
+    let unseenMessages =
+        0;
+
+
+    function nearMessageBottom() {
+
+        return (
+            fcMessages.scrollHeight -
+            fcMessages.scrollTop -
+            fcMessages.clientHeight <
+            120
+        );
+    }
+
+
+    function updateNewMessageIndicator() {
+
+        if (
+            unseenMessages <= 0
+        ) {
+
+            newMessageIndicator.classList.remove(
+                "visible"
+            );
+
+            return;
+        }
+
+        newMessageIndicator.textContent =
+            "↓ " +
+            unseenMessages +
+            (
+                unseenMessages === 1
+                    ? " new message"
+                    : " new messages"
+            );
+
+        newMessageIndicator.classList.add(
+            "visible"
+        );
+    }
+
+
+    newMessageIndicator.addEventListener(
+        "click",
+        () => {
+
+            unseenMessages = 0;
+
+            updateNewMessageIndicator();
+
+            /*
+             * Existing function handles the chat's own
+             * pause-auto-scroll state.
+             */
+            if (
+                typeof scrollToBottom ===
+                "function"
+            ) {
+
+                scrollToBottom(true);
+
+            } else {
+
+                fcMessages.scrollTop =
+                    fcMessages.scrollHeight;
+            }
+        }
+    );
+
+
+    fcMessages.addEventListener(
+        "scroll",
+        () => {
+
+            if (
+                nearMessageBottom()
+            ) {
+
+                unseenMessages = 0;
+
+                updateNewMessageIndicator();
+            }
+        }
+    );
+
+
+    const observer =
+        new MutationObserver(
+            mutations => {
+
+                let addedMessages =
+                    [];
+
+                for (
+                    const mutation
+                    of mutations
+                ) {
+
+                    for (
+                        const node
+                        of mutation.addedNodes
+                    ) {
+
+                        if (
+                            node.nodeType ===
+                                1 &&
+                            node.classList.contains(
+                                "message"
+                            )
+                        ) {
+
+                            addedMessages.push(
+                                node
+                            );
+                        }
+                    }
+                }
+
+                if (
+                    addedMessages.length ===
+                    0
+                ) {
+                    return;
+                }
+
+                const wasReadingOlderMessages =
+                    !nearMessageBottom();
+
+                addedMessages.forEach(
+                    processMessage
+                );
+
+                rebuildDateSeparators();
+
+                if (
+                    wasReadingOlderMessages
+                ) {
+
+                    unseenMessages +=
+                        addedMessages.length;
+
+                    updateNewMessageIndicator();
+                }
+            }
+        );
+
+
+    observer.observe(
+        fcMessageContent,
+        {
+            childList: true
+        }
+    );
+
+
+    /*
+     * If a pasted screenshot was already attached before
+     * this script finished loading, reflect it.
+     */
+    updateAttachmentPreview();
+
+})();
+</script>
+
+</body>
+</html>

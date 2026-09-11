@@ -1,0 +1,181 @@
+<svg
+  xmlns="http://www.w3.org/2000/svg"
+  width="1600"
+  height="900"
+  viewBox="0 0 1600 900">
+
+  <defs>
+    <linearGradient
+      id="bg"
+      x1="0"
+      y1="0"
+      x2="1"
+      y2="1">
+      <stop offset="0%" stop-color="#f9fcff"/>
+      <stop offset="100%" stop-color="#fff9f4"/>
+    </linearGradient>
+
+    <linearGradient
+      id="bubbleBlue"
+      x1="0"
+      y1="0"
+      x2="1"
+      y2="1">
+      <stop offset="0%" stop-color="#eef6ff"/>
+      <stop offset="100%" stop-color="#ddeaff"/>
+    </linearGradient>
+
+    <linearGradient
+      id="bubbleGreen"
+      x1="0"
+      y1="0"
+      x2="1"
+      y2="1">
+      <stop offset="0%" stop-color="#effcf2"/>
+      <stop offset="100%" stop-color="#ddf4e4"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Background -->
+  <rect
+    width="1600"
+    height="900"
+    fill="url(#bg)"/>
+
+  <!-- Title -->
+  <text
+    x="800"
+    y="135"
+    text-anchor="middle"
+    font-family="Arial, Helvetica, sans-serif"
+    font-size="92"
+    font-weight="700"
+    fill="#214f7d">
+    Family Chat
+  </text>
+
+  <!-- Subtitle -->
+  <text
+    x="800"
+    y="220"
+    text-anchor="middle"
+    font-family="Arial, Helvetica, sans-serif"
+    font-size="38"
+    fill="#425c75">
+    Stay connected with quick messages, photos, and updates.
+  </text>
+
+  <!-- Left blue person -->
+  <circle
+    cx="175"
+    cy="455"
+    r="64"
+    fill="#61a8f7"/>
+
+  <circle
+    cx="175"
+    cy="435"
+    r="23"
+    fill="#ffd8bc"/>
+
+  <path
+    d="M125 500
+       Q175 460 225 500
+       Z"
+    fill="#ffffff"/>
+
+  <!-- First message -->
+  <rect
+    x="270"
+    y="390"
+    width="640"
+    height="135"
+    rx="40"
+    fill="url(#bubbleBlue)"/>
+
+  <text
+    x="315"
+    y="470"
+    font-family="Arial, Helvetica, sans-serif"
+    font-size="38"
+    fill="#214f7d">
+    We're heading home now!
+  </text>
+
+  <!-- Picture-frame icon, moved higher -->
+  <rect
+    x="1125"
+    y="295"
+    width="285"
+    height="190"
+    rx="28"
+    fill="#eee9ff"/>
+
+  <rect
+    x="1145"
+    y="315"
+    width="245"
+    height="150"
+    rx="16"
+    fill="#7cc7f5"/>
+
+  <circle
+    cx="1335"
+    cy="350"
+    r="27"
+    fill="#ffd45c"/>
+
+  <path
+    d="M1148 463
+       L1220 385
+       L1270 435
+       L1320 398
+       L1387 463
+       Z"
+    fill="#65b66c"/>
+
+  <!-- Second message -->
+  <rect
+    x="380"
+    y="585"
+    width="700"
+    height="135"
+    rx="40"
+    fill="url(#bubbleGreen)"/>
+
+  <text
+    x="430"
+    y="665"
+    font-family="Arial, Helvetica, sans-serif"
+    font-size="38"
+    fill="#214f7d">
+    Great — dinner will be ready.
+  </text>
+
+  <!-- Right pink/orange person -->
+  <circle
+    cx="1195"
+    cy="655"
+    r="64"
+    fill="#ff9b75"/>
+
+  <circle
+    cx="1195"
+    cy="635"
+    r="23"
+    fill="#ffe0c7"/>
+
+  <path
+    d="M1145 700
+       Q1195 660 1245 700
+       Z"
+    fill="#ffffff"/>
+
+  <!-- Small accent -->
+  <circle
+    cx="210"
+    cy="790"
+    r="23"
+    fill="#ff657d"/>
+
+</svg>

@@ -1,0 +1,2472 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700&display=swap" rel="stylesheet">
+<style>
+
+.admin-area button {
+  padding:8px 14px;
+  background:#333;
+  border:none;
+  border-radius:8px;
+  color:white;
+  cursor:pointer;
+}
+
+.admin-area button:hover {
+  background:#444;
+}
+
+body {
+  background:#111;
+  color:white;
+  font-family:Arial;
+  text-align:center;
+  overflow-y:scroll;
+  overflow-x:hidden;
+  scrollbar-width: none;
+  -webkit-overflow-scrolling: touch;
+}
+
+body::-webkit-scrollbar {
+  display: none;
+}
+
+h1 {
+  margin-top:10px;
+  font-family:'Orbitron', sans-serif;
+  color:#66ff99;
+  font-size:2em;
+  letter-spacing:2px;
+  text-shadow:0 0 10px rgba(102,255,153,0.5);
+}
+
+.topbar {
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  padding:10px 20px;
+  gap:15px;
+  flex-wrap:nowrap;
+}
+
+.title {
+  flex:1;
+  text-align:left;
+}
+
+.title-row {
+  display:flex;
+  align-items:center;
+  gap:14px;
+}
+
+.title-row h1 {
+  margin:10px 0;
+}
+
+#radarButton {
+  padding:8px 14px;
+  background:#2d8cff;
+  border:none;
+  border-radius:8px;
+  color:white;
+  font-weight:600;
+  cursor:pointer;
+  white-space:nowrap;
+}
+
+#radarButton:hover {
+  background:#4aa0ff;
+}
+
+#radarOverlay {
+  display:none;
+  position:fixed;
+  inset:0;
+  z-index:30000;
+  background:#111;
+}
+
+#radarOverlay.open {
+  display:block;
+}
+
+#radarOverlay iframe {
+  width:100%;
+  height:100%;
+  border:none;
+}
+
+#closeRadarOverlay {
+  position:absolute;
+  top:12px;
+  right:12px;
+  z-index:30001;
+
+  padding:9px 15px;
+  border:none;
+  border-radius:8px;
+
+  background:#333;
+  color:white;
+  font-weight:600;
+  cursor:pointer;
+
+  box-shadow:0 2px 10px rgba(0,0,0,0.5);
+}
+
+#closeRadarOverlay:hover {
+  background:#444;
+}
+
+#addForm {
+  flex:2;
+  display:flex;
+  gap:10px;
+  justify-content:center;
+  align-items:center;
+}
+
+.player {
+  flex:1;
+  text-align:right;
+}
+
+.player audio {
+  width:220px;
+}
+
+.player-controls-row {
+  display:flex;
+  align-items:center;
+  justify-content:flex-end;
+  gap:10px;
+}
+
+/* Main grid layout */
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 15px;
+  padding: 10px;
+  max-width:100%;
+  margin: 0 auto;
+  box-sizing:border-box;
+}
+
+/* Station tiles */
+
+.station {
+  background:#222;
+  border-radius:15px;
+  padding:15px;
+  text-align:center;
+  cursor:pointer;
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+  align-items:center;
+  min-height:150px;
+  transition:0.2s;
+}
+
+.station:hover {
+  background:#333;
+}
+
+.station img {
+  width:65%;
+  max-width:100px;
+  height:auto;
+  object-fit:contain;
+}
+
+.station h3 {
+  margin-top:10px;
+  font-size:1.1em;
+}
+
+.station {
+  position:relative;
+}
+
+.station-drag-handle {
+  display:none;
+  position:absolute;
+  top:8px;
+  right:8px;
+  z-index:20;
+
+  width:34px;
+  height:34px;
+
+  align-items:center;
+  justify-content:center;
+
+  background:rgba(0,0,0,0.72);
+  border:1px solid rgba(255,255,255,0.25);
+  border-radius:8px;
+
+  color:white;
+  font-size:1.25rem;
+  line-height:1;
+
+  cursor:grab;
+  user-select:none;
+}
+
+.station-drag-handle:active {
+  cursor:grabbing;
+}
+
+.station.station-drag-enabled {
+  cursor:grab;
+}
+
+.station.dragging {
+  opacity:0.4;
+}
+
+.bottombar {
+  position:fixed;
+  bottom:0;
+  left:0;
+  width:100%;
+  background:#111;
+  padding:8px;
+  border-top:1px solid #333;
+  text-align:center;
+  z-index:1000;
+}
+
+.bottombar button {
+  padding:8px 14px;
+  background:#333;
+  border:none;
+  border-radius:8px;
+  color:white;
+}
+
+body {
+  padding-bottom:50px;
+}
+
+.nowPlayingWrap {
+  display:flex;
+  align-items:center;
+  gap:10px;
+  justify-content:flex-end;
+  margin-top:5px;
+}
+
+.equalizer {
+  display:flex;
+  gap:2px;
+}
+
+.equalizer span {
+  width:3px;
+  height:10px;
+  background:#4caf50;
+  animation: bounce 1s infinite ease-in-out;
+  animation-play-state: paused;
+}
+
+.equalizer span:nth-child(2) { animation-delay: .1s; }
+.equalizer span:nth-child(3) { animation-delay: .2s; }
+.equalizer span:nth-child(4) { animation-delay: .3s; }
+.equalizer span:nth-child(5) { animation-delay: .4s; }
+.equalizer.playing span {
+  animation-play-state: running;
+}
+
+.station h3 {
+  margin-top:10px;
+  font-size:1.1em;
+}
+
+/* 👇 ADD RIGHT BELOW HERE */
+
+.station-title {
+  margin-top:10px;
+  font-size:0.95em;
+  font-weight:600;
+  text-align:center;
+}
+
+.station-meta {
+  font-size:0.75em;
+  color:#aaa;
+  margin-top:3px;
+  text-align:center;
+}
+
+@keyframes bounce {
+  0%,100% { transform: scaleY(0.4); }
+  50% { transform: scaleY(1); }
+}
+
+/* 7" touchscreen layout */
+
+@media (max-width: 1024px) {
+  .grid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+/* 3.5" touchscreen layout */
+
+@media (max-width: 600px) {
+  .grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+.pause-btn {
+  padding:8px 14px;
+  background:#2d8cff;
+  border:none;
+  border-radius:8px;
+  color:white;
+  cursor:pointer;
+  font-size:14px;
+}
+
+.pause-btn:hover {
+  background:#4aa0ff;
+}
+
+/* Mobile fixes */
+
+@media (max-width: 600px) {
+
+  .topbar {
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .title {
+    text-align: center;
+  }
+
+  .player {
+    width: 100%;
+    text-align: center;
+  }
+
+  .player audio {
+    width: 100%;
+    max-width: 320px;
+  }
+
+  .nowPlayingWrap {
+    justify-content: center;
+    flex-wrap: wrap;
+    padding: 0 10px;
+  }
+
+  #nowPlaying {
+    max-width: 180px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+}
+
+
+.empty-state {
+  grid-column: 1 / -1;
+  text-align: center;
+  padding: 42px 30px;
+  margin: 18px auto 0;
+  max-width: 680px;
+  border: 1px solid rgba(80, 255, 150, 0.35);
+  border-radius: 14px;
+  background: rgba(255,255,255,0.025);
+}
+
+.empty-state h2 {
+  margin: 0 0 10px;
+  font-size: 1.45rem;
+  font-weight: 600;
+}
+
+.empty-state p {
+  margin: 0 auto;
+  max-width: 560px;
+  line-height: 1.5;
+  opacity: 0.75;
+}
+
+
+/* SkyFam station management */
+
+.admin-area {
+  width: 100%;
+  text-align: center;
+  box-sizing: border-box;
+}
+
+#adminToggle {
+  margin: 14px auto;
+}
+
+.station-management {
+  width: min(900px, calc(100% - 40px));
+  margin: 12px auto 30px;
+  padding: 22px;
+  box-sizing: border-box;
+  border: 1px solid rgba(80, 255, 150, 0.35);
+  border-radius: 14px;
+  background: rgba(255,255,255,0.035);
+  flex-direction: column;
+  gap: 18px;
+}
+
+.radio-search-section {
+  padding-bottom: 18px;
+  border-bottom: 1px solid rgba(255,255,255,0.15);
+}
+
+.radio-search-title {
+  font-size: 1.05rem;
+  font-weight: 600;
+  text-align: left;
+  margin-bottom: 10px;
+}
+
+.radio-search-row {
+  display: flex;
+  gap: 8px;
+}
+
+.radio-search-row input {
+  flex: 1;
+  min-width: 0;
+  padding: 10px 12px;
+  border-radius: 8px;
+  border: 1px solid rgba(255,255,255,0.22);
+}
+
+.radio-search-row button {
+  white-space: nowrap;
+}
+
+#radioSearchStatus {
+  margin-top: 10px;
+  text-align: left;
+  font-size: 0.85rem;
+  opacity: 0.75;
+}
+
+#radioSearchResults {
+  display: grid;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.radio-search-result {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  text-align: left;
+  padding: 10px 12px;
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 9px;
+}
+
+.radio-search-info {
+  min-width: 0;
+}
+
+.radio-search-name {
+  font-weight: 600;
+}
+
+.radio-search-meta {
+  margin-top: 3px;
+  font-size: 0.78rem;
+  opacity: 0.7;
+}
+
+.radio-search-actions {
+  flex-shrink: 0;
+  display: flex;
+  gap: 7px;
+}
+
+.radio-search-actions .add-radio-station {
+  background: #2f9e5b;
+}
+
+.radio-search-actions .add-radio-station:hover {
+  background: #37b86b;
+}
+
+.radio-search-actions button {
+  background: #2d8cff;
+}
+
+.manual-divider {
+  margin: 2px 0 0;
+  text-align: left;
+  font-size: 0.95rem;
+  font-weight: 600;
+}
+
+@media (max-width: 600px) {
+  .radio-search-row {
+    flex-direction: column;
+  }
+
+  .radio-search-result {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+}
+
+
+.management-title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  text-align: left;
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.form-grid label {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  text-align: left;
+  font-size: 0.9rem;
+}
+
+.form-grid label span {
+  opacity: 0.8;
+}
+
+.form-grid input {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 10px 12px;
+  border-radius: 8px;
+  border: 1px solid rgba(255,255,255,0.22);
+}
+
+.form-grid input[type="file"] {
+  padding: 8px;
+}
+
+.full-width {
+  grid-column: 1 / -1;
+}
+
+@media (max-width: 700px) {
+  .form-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .full-width {
+    grid-column: auto;
+  }
+
+  .station-management {
+    width: calc(100% - 20px);
+    padding: 16px;
+  }
+}
+
+
+.station-source {
+  margin-top: 7px;
+  font-size: 0.68em;
+  opacity: 0.55;
+  font-style: italic;
+}
+
+
+.delete-station-button {
+  margin-top: 10px;
+  padding: 6px 11px;
+  background: #c62828;
+  color: white;
+  border: none;
+  border-radius: 7px;
+  cursor: pointer;
+  font-size: 0.75rem;
+}
+
+.delete-station-button:hover {
+  background: #e53935;
+}
+
+
+/* Final Station Management controls */
+
+.station-action-row {
+  display:flex;
+  justify-content:center;
+  gap:8px;
+  margin-top:10px;
+}
+
+.edit-station-button {
+  padding:6px 11px;
+  background:#2d8cff;
+  color:white;
+  border:none;
+  border-radius:7px;
+  cursor:pointer;
+  font-size:0.75rem;
+}
+
+.edit-station-button:hover {
+  background:#4aa0ff;
+}
+
+.station-action-row
+.delete-station-button {
+  margin-top:0;
+}
+
+#editStationModal {
+  display:none;
+  position:fixed;
+  inset:0;
+  z-index:20000;
+
+  background:
+    rgba(
+      0,
+      0,
+      0,
+      0.82
+    );
+
+  align-items:center;
+  justify-content:center;
+
+  padding:20px;
+  box-sizing:border-box;
+}
+
+.edit-station-modal-card {
+  width:min(
+    760px,
+    100%
+  );
+
+  max-height:90vh;
+  overflow-y:auto;
+
+  background:#1c1c1c;
+
+  border:
+    1px solid
+    rgba(
+      80,
+      255,
+      150,
+      0.4
+    );
+
+  border-radius:14px;
+  padding:22px;
+
+  box-sizing:border-box;
+  text-align:left;
+}
+
+.edit-station-modal-card h2 {
+  margin-top:0;
+}
+
+.edit-logo-compare {
+  display:flex;
+  align-items:flex-start;
+  gap:28px;
+}
+
+.edit-logo-compare > label {
+  flex:1;
+}
+
+.edit-station-current-logo img,
+.logo-preview-image {
+  width:100px;
+  height:100px;
+  object-fit:contain;
+
+  background:#111;
+
+  border:
+    1px solid
+    rgba(
+      255,
+      255,
+      255,
+      0.18
+    );
+
+  border-radius:8px;
+  padding:5px;
+  box-sizing:border-box;
+}
+
+.logo-preview-block {
+  margin-top:10px;
+  display:flex;
+  flex-direction:column;
+  gap:6px;
+}
+
+.logo-preview-block span {
+  font-size:0.8rem;
+  opacity:0.75;
+}
+
+.edit-station-actions {
+  display:flex;
+  justify-content:flex-end;
+  gap:10px;
+  margin-top:20px;
+}
+
+.edit-station-actions button {
+  padding:9px 16px;
+  border:none;
+  border-radius:8px;
+  color:white;
+  cursor:pointer;
+}
+
+#editStationCancel {
+  background:#555;
+}
+
+#editStationSave {
+  background:#2f9e5b;
+}
+
+/* Keep very long station data reasonable on phones.
+   Do NOT force every card to a fixed height. */
+@media (max-width:600px) {
+
+  .station-title {
+    display:-webkit-box;
+    -webkit-box-orient:vertical;
+    -webkit-line-clamp:3;
+    overflow:hidden;
+
+    line-height:1.2;
+    max-height:3.6em;
+  }
+
+  .station-meta {
+    display:-webkit-box;
+    -webkit-box-orient:vertical;
+    -webkit-line-clamp:4;
+    overflow:hidden;
+
+    line-height:1.25;
+    max-height:5em;
+  }
+
+  .station-source {
+    margin-top:5px;
+  }
+
+  .edit-logo-compare {
+    flex-direction:column;
+    gap:14px;
+  }
+}
+
+
+</style>
+
+</head>
+<body>
+
+<div class="topbar">
+
+  <div class="title">
+    <div class="title-row">
+      <h1>SkyFam Radio</h1>
+    </div>
+  </div>
+
+<div class="player">
+
+  <!-- Line 1 -->
+  <div class="player-controls-row">
+
+    <audio id="player" controls></audio>
+
+    <button
+      id="radarButton"
+      type="button"
+      onclick="openRadarOverlay()">
+      🌦 Radar
+    </button>
+
+  </div>
+
+  <!-- Line 2 -->
+  <div class="nowPlayingWrap">
+
+    <div class="equalizer">
+      <span></span><span></span><span></span><span></span><span></span>
+    </div>
+
+    <div id="nowPlaying">---</div>
+
+  </div>
+
+</div>
+
+</div> <!-- ✅ THIS WAS MISSING -->
+
+<div id="stations" class="grid"></div>
+
+<script>
+
+
+/* =========================================================
+   FINAL STATION EDIT / LOGO PREVIEW SUPPORT
+   ========================================================= */
+
+window.previewEditLogo = function(input) {
+
+  const preview =
+    document.getElementById(
+      "editNewLogoPreview"
+    )
+
+  const wrapper =
+    document.getElementById(
+      "editNewLogoWrap"
+    )
+
+  if (
+    !preview ||
+    !wrapper
+  ) {
+    return
+  }
+
+  const file =
+    input.files &&
+    input.files[0]
+
+  if (!file) {
+    preview.removeAttribute(
+      "src"
+    )
+
+    wrapper.style.display =
+      "none"
+
+    return
+  }
+
+  const reader =
+    new FileReader()
+
+  reader.onload =
+    function(event) {
+
+      preview.src =
+        event.target.result
+
+      wrapper.style.display =
+        "flex"
+    }
+
+  reader.readAsDataURL(
+    file
+  )
+}
+
+
+window.previewAddLogo = function(input) {
+
+  const preview =
+    document.getElementById(
+      "addLogoPreview"
+    )
+
+  const wrapper =
+    document.getElementById(
+      "addLogoPreviewWrap"
+    )
+
+  if (
+    !preview ||
+    !wrapper
+  ) {
+    return
+  }
+
+  const file =
+    input.files &&
+    input.files[0]
+
+  if (!file) {
+    preview.removeAttribute(
+      "src"
+    )
+
+    wrapper.style.display =
+      "none"
+
+    return
+  }
+
+  const reader =
+    new FileReader()
+
+  reader.onload =
+    function(event) {
+
+      preview.src =
+        event.target.result
+
+      wrapper.style.display =
+        "flex"
+    }
+
+  reader.readAsDataURL(
+    file
+  )
+}
+
+
+window.openEditStationModal =
+  function(station) {
+
+    document.getElementById(
+      "editOriginalStream"
+    ).value =
+      station.stream || ""
+
+    document.getElementById(
+      "editName"
+    ).value =
+      station.name || ""
+
+    document.getElementById(
+      "editCity"
+    ).value =
+      station.city || ""
+
+    document.getElementById(
+      "editGenre"
+    ).value =
+      station.genre || ""
+
+    document.getElementById(
+      "editTag"
+    ).value =
+      station.tag || ""
+
+    document.getElementById(
+      "editStream"
+    ).value =
+      station.stream || ""
+
+    document.getElementById(
+      "editPassword"
+    ).value =
+      ""
+
+    document.getElementById(
+      "editLogo"
+    ).value =
+      ""
+
+    document.getElementById(
+      "editNewLogoPreview"
+    ).removeAttribute(
+      "src"
+    )
+
+    document.getElementById(
+      "editNewLogoWrap"
+    ).style.display =
+      "none"
+
+    document.getElementById(
+      "editCurrentLogo"
+    ).src =
+      station.logo || ""
+
+    document.getElementById(
+      "editStationModal"
+    ).style.display =
+      "flex"
+  }
+
+
+window.closeEditStationModal =
+  function() {
+
+    document.getElementById(
+      "editStationModal"
+    ).style.display =
+      "none"
+  }
+
+
+window.saveEditStation =
+  async function(event) {
+
+    event.preventDefault()
+
+    const editForm =
+      document.getElementById(
+        "editStationForm"
+      )
+
+    const saveButton =
+      document.getElementById(
+        "editStationSave"
+      )
+
+    saveButton.disabled =
+      true
+
+    saveButton.innerText =
+      "Saving..."
+
+    try {
+
+      const formData =
+        new FormData(
+          editForm
+        )
+
+      const logoInput =
+        document.getElementById(
+          "editLogo"
+        )
+
+      if (
+        logoInput &&
+        logoInput.files &&
+        logoInput.files.length > 0
+      ) {
+        const logoFile =
+          logoInput.files[0]
+
+        formData.set(
+          "logo",
+          logoFile,
+          logoFile.name
+        )
+      }
+
+      const response =
+        await fetch(
+          "/edit_station",
+          {
+            method:"POST",
+            body:formData,
+            cache:"no-store"
+          }
+        )
+
+      const result =
+        await response.json()
+
+      if (!response.ok) {
+        throw new Error(
+          result.error ||
+          "Unable to save station"
+        )
+      }
+
+      window.closeEditStationModal()
+
+      /*
+       * Normal reload only.
+       * stations.json is already fetched no-store,
+       * and replacement logos use unique filenames.
+       */
+      window.location.reload()
+
+    } catch (error) {
+
+      alert(
+        error.message
+      )
+
+    } finally {
+
+      saveButton.disabled =
+        false
+
+      saveButton.innerText =
+        "Save Changes"
+    }
+
+    return false
+  }
+
+
+
+let stationManagementPassword = null
+let draggedStationCard = null
+
+
+function setStationDragMode(enabled) {
+
+  document.querySelectorAll(
+    ".station"
+  ).forEach(card => {
+
+    card.draggable = enabled
+
+    card.classList.toggle(
+      "station-drag-enabled",
+      enabled
+    )
+
+    const handle =
+      card.querySelector(
+        ".station-drag-handle"
+      )
+
+    if (handle) {
+      handle.style.display =
+        enabled
+          ? "flex"
+          : "none"
+    }
+  })
+}
+
+
+async function saveDraggedStationOrder() {
+
+  const cards =
+    Array.from(
+      document.querySelectorAll(
+        "#stations .station"
+      )
+    )
+
+  const streams =
+    cards.map(
+      card => card.dataset.stream
+    ).filter(Boolean)
+
+  if (!streams.length) {
+    return
+  }
+
+  if (!stationManagementPassword) {
+
+    stationManagementPassword =
+      window.prompt(
+        "Enter the SkyFam admin password to save station order:"
+      )
+
+    if (stationManagementPassword === null) {
+      stationManagementPassword = null
+      window.location.reload()
+      return
+    }
+  }
+
+  try {
+
+    const response =
+      await fetch(
+        "/reorder_stations",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type":
+              "application/json"
+          },
+          body: JSON.stringify({
+            password:
+              stationManagementPassword,
+            streams:
+              streams
+          })
+        }
+      )
+
+    const result =
+      await response.json()
+
+    if (!response.ok) {
+
+      stationManagementPassword =
+        null
+
+      throw new Error(
+        result.error ||
+        "Unable to save station order"
+      )
+    }
+
+  } catch (error) {
+
+    alert(error.message)
+
+    window.location.reload()
+  }
+}
+
+
+window.openRadarOverlay =
+  function() {
+
+    const overlay =
+      document.getElementById(
+        "radarOverlay"
+      )
+
+    if (overlay) {
+      overlay.classList.add(
+        "open"
+      )
+    }
+  }
+
+
+window.closeRadarOverlay =
+  function() {
+
+    const overlay =
+      document.getElementById(
+        "radarOverlay"
+      )
+
+    if (overlay) {
+      overlay.classList.remove(
+        "open"
+      )
+    }
+  }
+
+
+window.addEventListener(
+  "message",
+  function(event) {
+
+    if (
+      event.data &&
+      event.data.action ===
+        "closeRadarOverlay"
+    ) {
+      window.closeRadarOverlay()
+    }
+  }
+)
+
+
+window.onload = function() {
+
+  const radioPlayer =
+    document.getElementById(
+      "player"
+    )
+
+  if (radioPlayer) {
+
+    radioPlayer.addEventListener(
+      "play",
+      function() {
+
+        window.parent.postMessage(
+          {
+            action: "radioStarted"
+          },
+          "*"
+        )
+      }
+    )
+  }
+
+
+  const toggle = document.getElementById("adminToggle")
+  const adminForm = document.getElementById("addForm")
+
+  // Toggle admin form
+  if (toggle && adminForm) {
+    toggle.onclick = function() {
+
+      const isHidden = adminForm.style.display === "none" || adminForm.style.display === ""
+
+      if (isHidden) {
+        adminForm.style.display = "flex"
+        toggle.innerText = "Close Station Management"
+
+        window.parent.postMessage(
+          {
+            action: "stationManagement",
+            open: true
+          },
+          "*"
+        )
+
+        document.querySelectorAll(
+          ".station-action-row"
+        ).forEach(row => {
+          row.style.display = "flex"
+        })
+
+        setStationDragMode(true)
+
+      } else {
+        adminForm.style.display = "none"
+        toggle.innerText = "Manage Stations"
+
+        window.parent.postMessage(
+          {
+            action: "stationManagement",
+            open: false
+          },
+          "*"
+        )
+
+        document.querySelectorAll(
+          ".station-action-row"
+        ).forEach(row => {
+          row.style.display = "none"
+        })
+
+        setStationDragMode(false)
+        stationManagementPassword = null
+      }
+
+    }
+  }
+
+  /* Radio Browser station search */
+
+  const radioSearchInput =
+    document.getElementById("radioSearchInput")
+
+  const radioSearchButton =
+    document.getElementById("radioSearchButton")
+
+  const radioSearchResults =
+    document.getElementById("radioSearchResults")
+
+  const radioSearchStatus =
+    document.getElementById("radioSearchStatus")
+
+  function escapeHtml(value) {
+    const div = document.createElement("div")
+    div.textContent = value ?? ""
+    return div.innerHTML
+  }
+
+  async function searchRadioBrowser() {
+
+    const query =
+      radioSearchInput.value.trim()
+
+    if (query.length < 2) {
+      radioSearchStatus.innerText =
+        "Enter at least 2 characters."
+      return
+    }
+
+    radioSearchButton.disabled = true
+    radioSearchResults.innerHTML = ""
+    radioSearchStatus.innerText =
+      "Searching Radio Browser..."
+
+    try {
+
+      const response = await fetch(
+        `/radio_search?q=${encodeURIComponent(query)}`
+      )
+
+      const data = await response.json()
+
+      if (!response.ok) {
+        throw new Error(
+          data.error || "Search failed"
+        )
+      }
+
+      if (!data.length) {
+        radioSearchStatus.innerText =
+          "No matching stations found."
+        return
+      }
+
+      radioSearchStatus.innerText =
+        `${data.length} station(s) found`
+
+      data.forEach(station => {
+
+        const result =
+          document.createElement("div")
+
+        result.className =
+          "radio-search-result"
+
+        const location =
+          [station.state, station.country]
+            .filter(Boolean)
+            .join(", ")
+
+        const technical =
+          [
+            station.codec,
+            station.bitrate
+              ? `${station.bitrate} kbps`
+              : ""
+          ]
+          .filter(Boolean)
+          .join(" • ")
+
+        const details =
+          [location, station.tags, technical]
+            .filter(Boolean)
+            .join(" • ")
+
+        result.innerHTML = `
+          <div class="radio-search-info">
+            <div class="radio-search-name">
+              ${escapeHtml(station.name)}
+            </div>
+
+            <div class="radio-search-meta">
+              ${escapeHtml(details)}
+            </div>
+          </div>
+
+          <div class="radio-search-actions">
+            <button
+              type="button"
+              class="preview-radio-station">
+              ▶ Preview
+            </button>
+
+            <button
+              type="button"
+              class="add-radio-station">
+              ＋ Add Station
+            </button>
+          </div>
+        `
+
+        const previewButton =
+          result.querySelector(
+            ".preview-radio-station"
+          )
+
+        const addButton =
+          result.querySelector(
+            ".add-radio-station"
+          )
+
+        previewButton.onclick = async () => {
+
+          const player =
+            document.getElementById("player")
+
+          const nowPlaying =
+            document.getElementById("nowPlaying")
+
+          player.src =
+            station.stream
+
+          try {
+            await player.play()
+
+            nowPlaying.innerText =
+              station.name
+
+            window.parent.postMessage(
+              {
+                action: "radioStarted"
+              },
+              "*"
+            )
+
+            if (station.stationuuid) {
+              fetch(
+                "/radio_browser_click",
+                {
+                  method: "POST",
+                  headers: {
+                    "Content-Type":
+                      "application/json"
+                  },
+                  body: JSON.stringify({
+                    stationuuid:
+                      station.stationuuid
+                  })
+                }
+              )
+            }
+
+          } catch (error) {
+
+            nowPlaying.innerText =
+              "Unable to play station"
+
+            console.error(
+              "Preview failed:",
+              error
+            )
+          }
+        }
+
+        addButton.onclick = async () => {
+
+          const password =
+            window.prompt(
+              "Enter the SkyFam admin password:"
+            )
+
+          if (password === null) {
+            return
+          }
+
+          addButton.disabled = true
+          addButton.innerText =
+            "Adding..."
+
+          try {
+
+            const response =
+              await fetch(
+                "/add_radio_browser_station",
+                {
+                  method: "POST",
+                  headers: {
+                    "Content-Type":
+                      "application/json"
+                  },
+                  body: JSON.stringify({
+                    password: password,
+                    stationuuid:
+                      station.stationuuid,
+                    name:
+                      station.name,
+                    stream:
+                      station.stream,
+                    state:
+                      station.state,
+                    country:
+                      station.country,
+                    tags:
+                      station.tags
+                  })
+                }
+              )
+
+            const data =
+              await response.json()
+
+            if (!response.ok) {
+              throw new Error(
+                data.error ||
+                "Unable to add station"
+              )
+            }
+
+            addButton.innerText =
+              "✓ Added"
+
+            radioSearchStatus.innerText =
+              `${station.name} added to SkyFam Radio.`
+
+            setTimeout(
+              () => window.location.reload(),
+              700
+            )
+
+          } catch (error) {
+
+            addButton.disabled = false
+            addButton.innerText =
+              "＋ Add Station"
+
+            radioSearchStatus.innerText =
+              error.message
+
+          }
+
+        }
+
+        radioSearchResults.appendChild(result)
+
+      })
+
+    } catch (error) {
+
+      radioSearchStatus.innerText =
+        "Radio Browser search is unavailable."
+
+      console.error(error)
+
+    } finally {
+
+      radioSearchButton.disabled = false
+
+    }
+  }
+
+  if (
+    radioSearchInput &&
+    radioSearchButton
+  ) {
+
+    radioSearchButton.onclick =
+      searchRadioBrowser
+
+    radioSearchInput.addEventListener(
+      "keydown",
+      event => {
+        if (event.key === "Enter") {
+          event.preventDefault()
+          searchRadioBrowser()
+        }
+      }
+    )
+  }
+
+
+  /* Handle Add Station form */
+
+  const form = document.getElementById("addForm")
+
+  if (form) {
+    form.addEventListener("submit", async function(e) {
+
+      e.preventDefault()
+
+      const formData = new FormData(form)
+
+      await fetch("/add_station", {
+        method: "POST",
+        body: formData
+      })
+
+      window.location.reload()
+
+    })
+  }
+
+  /* Load stations */
+
+// 🎧 EQ control
+
+  const player = document.getElementById("player")
+  const eq = document.querySelector(".equalizer")
+
+  if (player && eq) {
+
+    player.addEventListener("playing", () => {
+      eq.classList.add("playing")
+    })
+
+    player.addEventListener("pause", () => {
+      eq.classList.remove("playing")
+    })
+
+    player.addEventListener("ended", () => {
+      eq.classList.remove("playing")
+    })
+
+  }
+
+  /* Load stations */
+
+  fetch(
+    '/stations.json?_=' + Date.now(),
+    {
+      cache: 'no-store'
+    }
+  )
+    .then(res => res.json())
+    .then(data => {
+
+      const container = document.getElementById("stations")
+
+      
+
+  if (!data.stations || data.stations.length === 0) {
+    container.innerHTML = `
+      <div class="empty-state">
+        <h2>No stations configured</h2>
+        <p>
+          Add a local, college, community, weather,
+          or other compatible internet radio stream.
+        </p>
+      </div>
+    `
+    return
+  }
+
+data.stations
+          .sort((a, b) => {
+            const orderA = a.order ?? 9999
+            const orderB = b.order ?? 9999
+            return orderA - orderB
+          })
+          .forEach(station => {
+
+          const div = document.createElement("div")
+          div.className = "station"
+          div.draggable = false
+          div.dataset.stream =
+            station.stream || ""
+
+          const title = station.name
+
+          let location = station.city || ""
+
+          // Keep international locations useful while shortening
+          // the rather long US country name.
+          location = location
+            .replace(
+              /(?:The\s+)?United States(?: of America)?/gi,
+              "USA"
+            )
+            .replace(
+              /,\s*The\s+USA/gi,
+              ", USA"
+            )
+
+          let genre = station.genre || ""
+
+          // Radio Browser commonly returns lower-case,
+          // comma-separated tags. Clean them for display.
+          genre = genre
+            .split(",")
+            .map(item => item.trim())
+            .filter(Boolean)
+            .map(item =>
+              item.replace(
+                /\b\w/g,
+                letter => letter.toUpperCase()
+              )
+            )
+            .join(" • ")
+
+          const meta = [
+            location,
+            genre,
+            station.source === "radio-browser"
+              ? ""
+              : station.tag
+          ]
+            .filter(Boolean)
+            .join("<br>")
+
+          const source =
+            station.source === "radio-browser"
+              ? `<div class="station-source">
+                   Source: Radio Browser
+                 </div>`
+              : ""
+
+          div.innerHTML = `
+          <div
+            class="station-drag-handle"
+            title="Drag to reorder station">
+            ☰
+          </div>
+
+          <img src="${station.logo}">
+          <div class="station-title">${title}</div>
+          <div class="station-meta">${meta}</div>
+          ${source}
+
+          <div
+            class="station-action-row"
+            style="display:none;">
+
+            <button
+              type="button"
+              class="edit-station-button">
+              ✎ Edit
+            </button>
+
+            <button
+              type="button"
+              class="delete-station-button">
+              ✖ Delete
+            </button>
+
+          </div>
+          `
+
+          const editButton =
+            div.querySelector(
+              ".edit-station-button"
+            )
+
+          editButton.onclick =
+            function(event) {
+
+              event.stopPropagation()
+
+              window.openEditStationModal(
+                station
+              )
+            }
+
+          const deleteButton =
+            div.querySelector(
+              ".delete-station-button"
+            )
+
+          deleteButton.onclick = async function(event) {
+
+            event.stopPropagation()
+
+            const confirmed =
+              window.confirm(
+                `Delete "${station.name}" from SkyFam Radio?`
+              )
+
+            if (!confirmed) {
+              return
+            }
+
+            const password =
+              window.prompt(
+                "Enter the SkyFam admin password:"
+              )
+
+            if (password === null) {
+              return
+            }
+
+            deleteButton.disabled = true
+            deleteButton.innerText =
+              "Deleting..."
+
+            try {
+
+              const response =
+                await fetch(
+                  "/delete_station",
+                  {
+                    method: "POST",
+                    headers: {
+                      "Content-Type":
+                        "application/json"
+                    },
+                    body: JSON.stringify({
+                      password: password,
+                      stream: station.stream
+                    })
+                  }
+                )
+
+              const result =
+                await response.json()
+
+              if (!response.ok) {
+                throw new Error(
+                  result.error ||
+                  "Unable to delete station"
+                )
+              }
+
+              div.remove()
+
+              const stationContainer =
+                document.getElementById(
+                  "stations"
+                )
+
+              if (
+                stationContainer &&
+                !stationContainer.querySelector(
+                  ".station"
+                )
+              ) {
+                stationContainer.innerHTML = `
+                  <div class="empty-state">
+                    <h2>No stations configured</h2>
+                    <p>
+                      Add a local, college, community, weather,
+                      or other compatible internet radio stream.
+                    </p>
+                  </div>
+                `
+              }
+
+            } catch (error) {
+
+              deleteButton.disabled = false
+              deleteButton.innerText =
+                "✖ Delete"
+
+              alert(error.message)
+            }
+          }
+
+          div.addEventListener(
+            "dragstart",
+            function(event) {
+
+              if (!div.draggable) {
+                event.preventDefault()
+                return
+              }
+
+              draggedStationCard = div
+
+              div.classList.add(
+                "dragging"
+              )
+
+              event.dataTransfer.effectAllowed =
+                "move"
+
+              event.dataTransfer.setData(
+                "text/plain",
+                div.dataset.stream || ""
+              )
+            }
+          )
+
+
+          div.addEventListener(
+            "dragend",
+            function() {
+
+              div.classList.remove(
+                "dragging"
+              )
+
+              draggedStationCard =
+                null
+            }
+          )
+
+
+          div.addEventListener(
+            "dragover",
+            function(event) {
+
+              if (
+                !draggedStationCard ||
+                draggedStationCard === div
+              ) {
+                return
+              }
+
+              event.preventDefault()
+
+              const rect =
+                div.getBoundingClientRect()
+
+              const middleX =
+                rect.left +
+                rect.width / 2
+
+              const middleY =
+                rect.top +
+                rect.height / 2
+
+              const verticalDistance =
+                Math.abs(
+                  event.clientY -
+                  middleY
+                )
+
+              const sameRow =
+                verticalDistance <
+                rect.height * 0.4
+
+              let placeBefore
+
+              if (sameRow) {
+                placeBefore =
+                  event.clientX <
+                  middleX
+              } else {
+                placeBefore =
+                  event.clientY <
+                  middleY
+              }
+
+              if (placeBefore) {
+
+                div.parentNode.insertBefore(
+                  draggedStationCard,
+                  div
+                )
+
+              } else {
+
+                div.parentNode.insertBefore(
+                  draggedStationCard,
+                  div.nextSibling
+                )
+              }
+            }
+          )
+
+
+          div.addEventListener(
+            "drop",
+            async function(event) {
+
+              event.preventDefault()
+              event.stopPropagation()
+
+              await saveDraggedStationOrder()
+            }
+          )
+
+
+          div.onclick = function(event) {
+
+            if (div.draggable) {
+              return
+            }
+
+            const player = document.getElementById("player")
+            const nowPlaying = document.getElementById("nowPlaying")
+
+player.src = station.stream
+player.play()
+
+window.parent.postMessage(
+    {
+        action:"radioStarted"
+    },
+    "*"
+)
+
+            startMetadataUpdates(station)
+          }
+
+          container.appendChild(div)
+
+        })
+
+    })
+
+}
+
+
+
+let metadataTimer = null
+let metadataController = null
+let metadataRequestId = 0
+
+async function updateMetadata(station, requestId) {
+
+  if (!station || requestId !== metadataRequestId) {
+    return
+  }
+
+  if (metadataController) {
+    metadataController.abort()
+  }
+
+  metadataController = new AbortController()
+
+  const nowPlaying =
+    document.getElementById("nowPlaying")
+
+  try {
+
+    const response = await fetch(
+      `/metadata?stream=${encodeURIComponent(station.stream)}&_=${Date.now()}`,
+      {
+        cache: "no-store",
+        signal: metadataController.signal
+      }
+    )
+
+    const data = await response.json()
+
+    // Ignore a response belonging to an older station.
+    if (requestId !== metadataRequestId) {
+      return
+    }
+
+    const title =
+      (data.title || "").trim()
+
+    const stationName =
+      station.name.trim()
+
+    nowPlaying.innerText =
+      title &&
+      title.toLowerCase() !== stationName.toLowerCase()
+        ? `${title} — ${stationName}`
+        : stationName
+
+  } catch (error) {
+
+    if (error.name === "AbortError") {
+      return
+    }
+
+    if (requestId === metadataRequestId) {
+      nowPlaying.innerText = station.name
+    }
+
+  }
+
+}
+
+function startMetadataUpdates(station) {
+
+  metadataRequestId += 1
+  const requestId = metadataRequestId
+
+  if (metadataTimer) {
+    clearInterval(metadataTimer)
+    metadataTimer = null
+  }
+
+  if (metadataController) {
+    metadataController.abort()
+    metadataController = null
+  }
+
+  const nowPlaying =
+    document.getElementById("nowPlaying")
+
+  // Immediately replace any title from the previous station.
+  nowPlaying.innerText = station.name
+
+  updateMetadata(station, requestId)
+
+  metadataTimer = setInterval(() => {
+    updateMetadata(station, requestId)
+  }, 30000)
+
+}
+
+// ==================== Dashboard Control ====================
+
+window.addEventListener("message", (event) => {
+
+  console.log("Radio received:", event.origin, event.data);
+
+  const player = document.getElementById("player")
+
+  if (!player) return
+
+if (event.data.action === "pauseRadio") {
+
+    player.pause();
+
+    player.currentTime = 0;
+
+}
+
+  if (event.data.action === "playRadio") {
+    player.play()
+  }
+
+})
+
+function pauseRadio() {
+
+  const player =
+  document.getElementById("player")
+
+  if (player) {
+
+    player.pause()
+
+    player.currentTime = 0
+
+  }
+
+}
+
+</script>
+
+
+<div id="editStationModal">
+
+  <div class="edit-station-modal-card">
+
+    <h2>Edit Station</h2>
+
+    <form
+      id="editStationForm"
+      enctype="multipart/form-data"
+      onsubmit="return saveEditStation(event)">
+
+      <input
+        type="hidden"
+        id="editOriginalStream"
+        name="original_stream">
+
+      <div class="form-grid">
+
+        <label>
+          <span>Station Name</span>
+
+          <input
+            id="editName"
+            name="name"
+            type="text"
+            required>
+        </label>
+
+        <label>
+          <span>Location</span>
+
+          <input
+            id="editCity"
+            name="city"
+            type="text">
+        </label>
+
+        <label>
+          <span>Genre / Type</span>
+
+          <input
+            id="editGenre"
+            name="genre"
+            type="text">
+        </label>
+
+        <label>
+          <span>Tag</span>
+
+          <input
+            id="editTag"
+            name="tag"
+            type="text">
+        </label>
+
+        <label class="full-width">
+          <span>Stream URL</span>
+
+          <input
+            id="editStream"
+            name="stream"
+            type="text"
+            required>
+        </label>
+
+        <div
+          class="full-width
+                 edit-logo-compare">
+
+          <label>
+            <span>Current Logo</span>
+
+            <div
+              class="edit-station-current-logo">
+
+              <img
+                id="editCurrentLogo"
+                alt="Current station logo">
+
+            </div>
+          </label>
+
+          <label>
+            <span>
+              Replace Logo (optional)
+            </span>
+
+            <input
+              id="editLogo"
+              name="logo"
+              type="file"
+              accept="image/*"
+              onchange="previewEditLogo(this)">
+
+            <div
+              id="editNewLogoWrap"
+              class="logo-preview-block"
+              style="display:none;">
+
+              <span>
+                New Logo Preview
+              </span>
+
+              <img
+                id="editNewLogoPreview"
+                class="logo-preview-image"
+                alt="New station logo preview">
+
+            </div>
+
+          </label>
+
+        </div>
+
+        <label class="full-width">
+          <span>Admin Password</span>
+
+          <input
+            id="editPassword"
+            name="password"
+            type="password"
+            placeholder="Required to save changes"
+            required>
+        </label>
+
+      </div>
+
+      <div class="edit-station-actions">
+
+        <button
+          type="button"
+          id="editStationCancel"
+          onclick="closeEditStationModal()">
+          Cancel
+        </button>
+
+        <button
+          type="submit"
+          id="editStationSave">
+          Save Changes
+        </button>
+
+      </div>
+
+    </form>
+
+  </div>
+
+</div>
+
+
+<div class="admin-area">
+
+  <button id="adminToggle">Manage Stations</button>
+
+<form id="addForm" class="station-management" enctype="multipart/form-data" style="display:none;">
+
+  <div class="management-title">Station Management</div>
+
+  <div class="radio-search-section">
+
+    <div class="radio-search-title">
+      Find a Station
+    </div>
+
+    <div class="radio-search-row">
+      <input
+        id="radioSearchInput"
+        type="text"
+        placeholder="Search by station, city or state">
+
+      <button
+        type="button"
+        id="radioSearchButton">
+        Search
+      </button>
+    </div>
+
+    <div id="radioSearchStatus"></div>
+    <div id="radioSearchResults"></div>
+
+  </div>
+
+  <div class="manual-divider">
+    Or add a stream manually
+  </div>
+
+  <div class="form-grid">
+
+    <label>
+      <span>Station Name</span>
+      <input type="text" name="name" placeholder="Example: Local Weather Radio" required>
+    </label>
+
+    <label>
+      <span>Location</span>
+      <input type="text" name="city" placeholder="City, State">
+    </label>
+
+    <label>
+      <span>Genre / Type</span>
+      <input type="text" name="genre" placeholder="Weather, College, News...">
+    </label>
+
+    <label>
+      <span>Tag</span>
+      <input type="text" name="tag" placeholder="School, Team, Community...">
+    </label>
+
+    <label class="full-width">
+      <span>Stream URL</span>
+      <input type="text" name="stream" placeholder="https://..." required>
+    </label>
+
+    <label>
+      <span>Station Logo</span>
+      <input
+        id="addStationLogo"
+        type="file"
+        name="logo"
+        accept="image/*"
+        onchange="previewAddLogo(this)"
+        required>
+
+      <div
+        id="addLogoPreviewWrap"
+        class="logo-preview-block"
+        style="display:none;">
+
+        <span>Logo Preview</span>
+
+        <img
+          id="addLogoPreview"
+          class="logo-preview-image"
+          alt="Station logo preview">
+
+      </div>
+    </label>
+
+    <label>
+      <span>Admin Password</span>
+      <input type="password" name="password" placeholder="Required to save changes" required>
+    </label>
+
+  </div>
+
+  <button type="submit" class="add-station-button">Add Station</button>
+
+</form>
+
+</div>
+
+<div id="radarOverlay">
+
+  <iframe
+    src="/radar"
+    title="SkyFam Radar">
+  </iframe>
+
+</div>
+
+</body>
+</html>

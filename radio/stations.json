@@ -1,0 +1,28 @@
+{
+  "stations": [
+    {
+      "order": 1,
+      "name": "WEFT 90.1 East Central Illinois Community Radio",
+      "city": "Champaign-Urbana, Illinois, USA",
+      "genre": "Sample Station",
+      "tag": "Radio Browser",
+      "logo": "logos/default-radio.svg",
+      "stream": "https://weft.broadcasttool.stream/stream",
+      "source": "radio-browser",
+      "stationuuid": "227d44b4-e3b5-4ded-895b-9d240eb11448",
+      "radio_browser_original_name": "WEFT 90.1 East Central Illinois Community Radio"
+    },
+    {
+      "order": 2,
+      "name": "Montana Public Radio",
+      "city": "USA",
+      "genre": "Sample Station",
+      "tag": "Radio Browser",
+      "logo": "logos/default-radio.svg",
+      "stream": "https://playerservices.streamtheworld.com/api/livestream-redirect/KUFMFM.mp3?uuid=j285sajjp",
+      "source": "radio-browser",
+      "stationuuid": "818f802a-f305-412b-b84c-5beb81faf05d",
+      "radio_browser_original_name": "Montana Public Radio"
+    }
+  ]
+}
