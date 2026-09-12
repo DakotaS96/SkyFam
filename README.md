@@ -489,6 +489,12 @@ Please do **not** include passwords or API keys in bug reports.
 
 # Credits and Licensing
 
+SkyFam's original project code is licensed under the **GNU General Public License version 3 or later** (`GPL-3.0-or-later`).
+
+If you distribute a modified version of SkyFam, you must make the corresponding source code available under the same license.
+
+Bundled third-party components remain under their respective licenses.
+
 See:
 
 ```text

@@ -21,9 +21,8 @@ https://github.com/kakorcal/bubble-shooter
 
 License: ISC
 
-SkyFam includes both source material under `dashboard/games/bubbleshooter`
-and a browser-ready/static build under
-`dashboard/games/bubbleshooter-static`.
+SkyFam includes the upstream source material and a browser-ready build under
+`dashboard/games/bubbleshooter`.
 
 The upstream project also includes third-party game-engine, graphics, audio,
 and JavaScript dependencies. Their copyright and license notices remain in
