@@ -248,174 +248,155 @@ do
 done
 
 # ------------------------------------------------------------
-# Optional Caddy setup
+# Remote access
 # ------------------------------------------------------------
 
 echo
 echo "============================================================"
-echo "Public HTTPS access"
+echo "Remote access"
 echo "============================================================"
 echo
-echo "SkyFam already works on your local network."
+echo "SkyFam is ready for use on your local network."
 echo
-echo "Caddy can optionally provide HTTPS for your own domain."
-echo
-echo "You may also skip this and use Nginx, Nginx Proxy Manager,"
-echo "Traefik, Cloudflare Tunnel, or another reverse proxy."
-echo
-
-echo "1) Set up Caddy"
-echo "2) I will use my own reverse proxy"
-echo "3) LAN access only"
+echo "SkyFam may contain private family messages, photos, and videos."
+echo "Do not forward ports 5000, 5050, or 5080 through your router."
+echo "HTTPS alone does not make SkyFam private."
 echo
 
-read -r -p "Choose [1-3]: " proxy_choice
+echo "1) Keep SkyFam on the local network only (recommended)"
+echo "2) Install Tailscale for private remote access"
+echo "3) I already have protected remote access (advanced)"
+echo
 
-case "$proxy_choice" in
+read -r -p "Choose [1-3, default 1]: " remote_choice
+remote_choice="${remote_choice:-1}"
+
+case "$remote_choice" in
     1)
         echo
-        echo "Before continuing:"
-        echo "  - Your DNS records must point to this server's public IP."
-        echo "  - TCP ports 80 and 443 must reach this server."
-        echo
-
-        read -r -p "Dashboard hostname (example: skyfam.example.com): " DASH_DOMAIN
-        read -r -p "FamilyChat hostname (example: chat.example.com): " CHAT_DOMAIN
-        read -r -p "Radio hostname (example: radio.example.com): " RADIO_DOMAIN
-
-        valid_hostname() {
-            local host="$1"
-
-            [[ -n "$host" ]] &&
-            [[ "$host" =~ ^([A-Za-z0-9]([A-Za-z0-9-]{0,61}[A-Za-z0-9])?\.)+[A-Za-z]{2,63}$ ]]
-        }
-
-        if ! valid_hostname "$DASH_DOMAIN" ||
-           ! valid_hostname "$CHAT_DOMAIN" ||
-           ! valid_hostname "$RADIO_DOMAIN"; then
-            echo
-            echo "One or more hostnames are invalid."
-            echo
-            echo "Enter hostnames only, for example:"
-            echo "  skyfam.example.com"
-            echo "  chat.example.com"
-            echo "  radio.example.com"
-            echo
-            echo "Do not include https:// or a path."
-            echo
-            echo "Skipping Caddy configuration."
-        else
-            echo
-            echo "Installing Caddy..."
-
-            apt install -y caddy
-
-            if [[ -f /etc/caddy/Caddyfile ]]; then
-                cp -a /etc/caddy/Caddyfile \
-                    "/etc/caddy/Caddyfile.backup.$(date +%Y%m%d-%H%M%S)"
-            fi
-
-            cat > /etc/caddy/Caddyfile <<EOF_CADDY
-${DASH_DOMAIN} {
-    reverse_proxy 127.0.0.1:5000
-}
-
-${CHAT_DOMAIN} {
-    reverse_proxy 127.0.0.1:5050
-}
-
-${RADIO_DOMAIN} {
-    reverse_proxy 127.0.0.1:5080
-}
-EOF_CADDY
-
-            if ! caddy validate --config /etc/caddy/Caddyfile; then
-                echo
-                echo "ERROR: Caddy configuration validation failed."
-                echo "The previous Caddy configuration was not started."
-                exit 1
-            fi
-
-            systemctl enable caddy
-            systemctl restart caddy
-
-            umask 077
-            cat > /etc/skyfam-public.env <<EOF_PUBLIC
-SKYFAM_DASHBOARD_URL=https://${DASH_DOMAIN}
-SKYFAM_CHAT_URL=https://${CHAT_DOMAIN}
-SKYFAM_RADIO_URL=https://${RADIO_DOMAIN}
-EOF_PUBLIC
-            chmod 600 /etc/skyfam-public.env
-
-            systemctl restart \
-                dashboard.service \
-                familychat.service \
-                skyfam-radio.service
-
-            echo
-            echo "Caddy configuration installed."
-            echo
-            echo "Dashboard:  https://${DASH_DOMAIN}"
-            echo "FamilyChat: https://${CHAT_DOMAIN}"
-            echo "Radio:      https://${RADIO_DOMAIN}"
-            echo
-            echo "Caddy will obtain HTTPS certificates automatically"
-            echo "once DNS and ports 80/443 are reachable."
-        fi
+        echo "SkyFam will remain available only on your local network."
+        echo "This is the safest default."
         ;;
 
     2)
         echo
-        echo "Use these SkyFam backend addresses with your reverse proxy:"
-        echo
-        echo "  Dashboard:  http://127.0.0.1:5000"
-        echo "  FamilyChat: http://127.0.0.1:5050"
-        echo "  Radio:      http://127.0.0.1:5080"
-        echo
-        echo "Enter the public URLs that your reverse proxy will provide."
-        echo "Example: https://skyfam.example.com"
+        echo "Tailscale creates a private connection between approved devices."
+        echo "Each remote phone, tablet, or computer must also use Tailscale."
+        echo "Do not enable Tailscale Funnel for SkyFam."
         echo
 
-        read -r -p "Dashboard public URL: " DASH_PUBLIC_URL
-        read -r -p "FamilyChat public URL: " CHAT_PUBLIC_URL
-        read -r -p "Radio public URL: " RADIO_PUBLIC_URL
-
-        valid_public_url() {
-            local url="$1"
-
-            [[ "$url" =~ ^https?://[^[:space:]]+$ ]]
-        }
-
-        if ! valid_public_url "$DASH_PUBLIC_URL" ||
-           ! valid_public_url "$CHAT_PUBLIC_URL" ||
-           ! valid_public_url "$RADIO_PUBLIC_URL"; then
-            echo
-            echo "One or more public URLs are invalid."
-            echo "No SkyFam public URL configuration was written."
+        if command -v tailscale >/dev/null 2>&1; then
+            echo "Tailscale is already installed."
         else
-            umask 077
+            echo "Installing Tailscale from its official installer..."
 
-            cat > /etc/skyfam-public.env <<EOF_PUBLIC
+            if ! curl -fsSL https://tailscale.com/install.sh | sh; then
+                echo
+                echo "WARNING: Tailscale installation failed."
+                echo "SkyFam is still available on the local network."
+                remote_choice="1"
+            fi
+        fi
+
+        if [[ "$remote_choice" == "2" ]]; then
+            echo
+            echo "Tailscale will now display a sign-in link."
+            echo "Open it and approve this SkyFam server."
+            echo
+
+            if tailscale up; then
+                TAILSCALE_IP="$(tailscale ip -4 2>/dev/null | head -n 1)"
+
+                if [[ -n "$TAILSCALE_IP" ]]; then
+                    echo
+                    echo "Tailscale private access is ready:"
+                    echo "  Dashboard:  http://${TAILSCALE_IP}:5000"
+                    echo "  FamilyChat: http://${TAILSCALE_IP}:5050"
+                    echo "  Radio:      http://${TAILSCALE_IP}:5080"
+                    echo
+                    echo "Install Tailscale on each approved remote device and"
+                    echo "sign in to the same Tailscale network."
+                else
+                    echo
+                    echo "WARNING: Tailscale connected, but no private IP was found."
+                    echo "SkyFam remains available on the local network."
+                fi
+            else
+                echo
+                echo "WARNING: Tailscale setup was not completed."
+                echo "SkyFam remains available on the local network."
+            fi
+        fi
+        ;;
+
+    3)
+        echo
+        echo "Advanced remote access requires authentication in front of"
+        echo "every SkyFam service. Recommended examples include:"
+        echo "  - Cloudflare Tunnel protected by Cloudflare Access and MFA"
+        echo "  - An authenticated reverse proxy"
+        echo "  - A private VPN"
+        echo
+        echo "Caddy or HTTPS by itself does not restrict who can view SkyFam."
+        echo "A Cloudflare Tunnel without Cloudflare Access is not private."
+        echo "Do not forward SkyFam ports directly through your router."
+        echo
+
+        read -r -p "Have you protected all three URLs with authentication? [y/N]: " protected_answer
+
+        if [[ "$protected_answer" =~ ^[Yy]$ ]]; then
+            echo
+            read -r -p "Dashboard protected URL: " DASH_PUBLIC_URL
+            read -r -p "FamilyChat protected URL: " CHAT_PUBLIC_URL
+            read -r -p "Radio protected URL: " RADIO_PUBLIC_URL
+
+            valid_protected_url() {
+                local url="$1"
+
+                [[ "$url" =~ ^https://[^[:space:]]+$ ]]
+            }
+
+            if ! valid_protected_url "$DASH_PUBLIC_URL" ||
+               ! valid_protected_url "$CHAT_PUBLIC_URL" ||
+               ! valid_protected_url "$RADIO_PUBLIC_URL"; then
+                echo
+                echo "One or more protected URLs are invalid."
+                echo "All three must begin with https://."
+                echo "No remote URL configuration was written."
+            else
+                umask 077
+
+                cat > /etc/skyfam-public.env <<EOF_PUBLIC
 SKYFAM_DASHBOARD_URL=${DASH_PUBLIC_URL}
 SKYFAM_CHAT_URL=${CHAT_PUBLIC_URL}
 SKYFAM_RADIO_URL=${RADIO_PUBLIC_URL}
 EOF_PUBLIC
+                chmod 600 /etc/skyfam-public.env
 
-            chmod 600 /etc/skyfam-public.env
+                systemctl restart \
+                    dashboard.service \
+                    familychat.service \
+                    skyfam-radio.service
 
-            systemctl restart                 dashboard.service                 familychat.service                 skyfam-radio.service
-
+                echo
+                echo "Protected remote URLs configured."
+                echo "Dashboard:  ${DASH_PUBLIC_URL}"
+                echo "FamilyChat: ${CHAT_PUBLIC_URL}"
+                echo "Radio:      ${RADIO_PUBLIC_URL}"
+                echo
+                echo "Test each URL in a private browser window."
+                echo "The authentication screen must appear before SkyFam."
+            fi
+        else
             echo
-            echo "SkyFam public URLs configured."
-            echo "Dashboard:  ${DASH_PUBLIC_URL}"
-            echo "FamilyChat: ${CHAT_PUBLIC_URL}"
-            echo "Radio:      ${RADIO_PUBLIC_URL}"
+            echo "Skipping remote URL configuration."
+            echo "SkyFam remains available on the local network."
         fi
         ;;
 
     *)
         echo
-        echo "Skipping public reverse-proxy configuration."
+        echo "Unknown choice. SkyFam will remain local-network only."
         ;;
 esac
 
