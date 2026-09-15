@@ -262,7 +262,7 @@ This file should never be uploaded to GitHub.
 
 SkyFam can optionally use the YouTube Data API for automatic livestream detection.
 
-A YouTube API key is **not required** for the basic SkyFam dashboard.
+A YouTube API key is **not required** for the basic SkyFam dashboard. However, it is recommended for alerting when Ryan Hall goes live for severe weather streams.
 
 If you configure one, it is stored locally in:
 
