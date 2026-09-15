@@ -236,25 +236,35 @@ More detailed Raspberry Pi kiosk instructions are planned as testing continues.
 
 # Administrator Features
 
-SkyFam includes a hidden administrator interface.
+SkyFam includes a hidden administrator interface. To open it, press and hold the YallBot text in the upper-left corner of the embedded YallBot YouTube player.
 
 Current administrator features include:
 
-- YouTube API settings
-- Manual Live Event controls
-- Change Admin Password
+* Internet radio controls
+* YouTube API settings
+* Manual Live Event controls
+* Change Admin Password
 
-The SkyFam administrator password is separate from the Debian/Linux root password.
+The default SkyFam administrator password is:
 
-Changing the SkyFam admin password does **not** change the Linux root password.
+```text
+Sky4Fam!
+```
 
-The admin password is stored locally in:
+Change this password after installation.
+
+This is the password for SkyFam’s administrator features. It is separate from the Debian/Linux root password and does not provide access to the Linux root account.
+
+Changing the SkyFam administrator password does **not** change the Linux root password.
+
+The SkyFam administrator password is stored locally in:
 
 ```text
 /etc/skyfam-admin.env
 ```
 
-This file should never be uploaded to GitHub.
+This file contains sensitive information and should never be uploaded to GitHub.
+
 
 ---
 
