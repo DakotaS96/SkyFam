@@ -1,6 +1,7 @@
 # SkyFam
 
 SkyFam is a self-hosted family dashboard designed for TVs, monitors, tablets, Raspberry Pis, and other always-on displays.
+> **[Read why I built SkyFam →](AUTHOR_NOTE.md)**
 
 It combines several family-oriented features into one place:
 
