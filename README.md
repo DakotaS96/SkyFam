@@ -14,6 +14,8 @@ It combines several family-oriented features into one place:
 - Photo slideshow
 - Optional HTTPS access
 
+![SkyFam dashboard](SkyFam3.png)
+
 > **Project Status**
 >
 > SkyFam is currently in active testing and development.
