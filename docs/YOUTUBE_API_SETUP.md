@@ -1,6 +1,6 @@
 # Create a YouTube Data API Key for SkyFam
 
-SkyFam uses the YouTube Data API to check YouTube for supported livestream information. This guide walks through creating a Google Cloud project, enabling the YouTube Data API, creating a restricted API key, and saving it in SkyFam.
+SkyFam uses the YouTube Data API to check YouTube for supported livestream information. This guide walks through creating a Google Cloud project, creating a restricted YouTube Data API key, and saving it in SkyFam.
 
 You will need:
 
@@ -49,39 +49,31 @@ Google occasionally changes the appearance of the Cloud Console. The wording or 
 
    ![Open APIs and Services](images/youtube-api/07-apis-and-services.png)
    
-   Click Credentials on the left
+2.  Click Credentials on the left
 
    ![Select Library from the API menu](images/youtube-api/08-api-menu.png)
 
-2. Search for `YouTube Data API v3`.
-
-3. Select **YouTube Data API v3**, then click **Enable**.
-
-4. Wait for Google Cloud to finish enabling the API before continuing.
-
-## Create and restrict the API key
-
-1. Click **Create credentials**, then select **API key**.
+3. Click **Create credentials**, then select **API key**.
 
    ![Create an API key](images/youtube-api/09-create-api-key.png)
 
-2. Enter a recognizable name for the key, such as `SkyFamYouTube`.
+4. Enter a recognizable name for the key, such as `SkyFamYouTube`.
 
    ![Name the API key](images/youtube-api/10-api-key-name.png)
 
-3. Under **API restrictions**, click the field that says **No APIs selected**.
+5. Under **API restrictions**, click the field that says **No APIs selected**.
 
    ![Open API restrictions](images/youtube-api/11-api-restrictions.png)
 
-4. Select **YouTube Data API v3**, then click **OK**.
+6. Select **YouTube Data API v3**, then click **OK**.
 
    ![Restrict the key to YouTube Data API v3](images/youtube-api/12-youtube-data-api-restriction.png)
 
-5. Click **Create** at the bottom of the page.
+7. Click **Create** at the bottom of the page.
 
    ![Create the restricted key](images/youtube-api/13-create-key.png)
 
-6. When Google displays the API key, click the copy icon.
+8. When Google displays the API key, click the copy icon.
 
    ![Copy the API key](images/youtube-api/14-copy-key.png)
 
