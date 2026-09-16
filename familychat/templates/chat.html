@@ -297,6 +297,87 @@ button {
 }
 
 /* ===================================================== */
+/* SILVER MODERATOR AUTHENTICATION */
+/* ===================================================== */
+
+#familyChatAdminModal {
+    display: none;
+    position: fixed;
+    inset: 0;
+
+    z-index: 200000;
+
+    align-items: center;
+    justify-content: center;
+
+    padding: 20px;
+    box-sizing: border-box;
+
+    background: rgba(0,0,0,0.82);
+}
+
+.familychat-admin-box {
+    width: min(420px, 100%);
+    padding: 22px;
+    box-sizing: border-box;
+
+    background: #1a1a1a;
+    color: white;
+
+    border: 2px solid #66ff99;
+    border-radius: 12px;
+}
+
+.familychat-admin-box h2 {
+    margin: 0 0 10px;
+    color: #66ff99;
+}
+
+.familychat-admin-box p {
+    margin: 0 0 14px;
+    line-height: 1.4;
+}
+
+#familyChatAdminPassword {
+    width: 100%;
+    box-sizing: border-box;
+
+    padding: 10px 12px;
+    margin-bottom: 10px;
+
+    font-size: 16px;
+}
+
+.familychat-admin-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+}
+
+.familychat-admin-actions button {
+    padding: 8px 12px;
+    border: none;
+    border-radius: 6px;
+
+    color: white;
+    background: #2d8cff;
+
+    cursor: pointer;
+}
+
+#familyChatAdminCancel {
+    background: #555;
+}
+
+#familyChatAdminStatus {
+    min-height: 1.3em;
+    margin: 8px 0;
+
+    color: #ff8a8a;
+}
+
+
+/* ===================================================== */
 /* IMAGE / VIDEO FULLSCREEN MEDIA VIEWER */
 /* ===================================================== */
 
@@ -1367,6 +1448,53 @@ Delete ✕
 
 </div>
 
+<div
+    id="familyChatAdminModal"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="familyChatAdminTitle"
+    aria-hidden="true">
+
+    <div class="familychat-admin-box">
+
+        <h2 id="familyChatAdminTitle">
+            Silver Moderator
+        </h2>
+
+        <p>
+            Enter the SkyFam administrator password
+            to delete messages written by other users.
+        </p>
+
+        <input
+            type="password"
+            id="familyChatAdminPassword"
+            autocomplete="current-password"
+            placeholder="Administrator password">
+
+        <div id="familyChatAdminStatus"></div>
+
+        <div class="familychat-admin-actions">
+
+            <button
+                type="button"
+                id="familyChatAdminCancel">
+                Cancel
+            </button>
+
+            <button
+                type="button"
+                id="familyChatAdminUnlock">
+                Unlock
+            </button>
+
+        </div>
+
+    </div>
+
+</div>
+
+
 <div id="videoModal" class="video-modal">
 
     <div class="youtube-modal-header">
@@ -1870,12 +1998,11 @@ setInterval(
 /* =========================================================
    FAMILY CHAT DELETE BUTTON VISIBILITY
 
-   Trust-based model:
+   Moderation model:
    - Message author may delete their own message
-   - Silver may delete any message
-   - Everyone else sees no Delete button
-
-   Backend authorization remains unchanged.
+   - Silver sees moderator delete controls
+   - Server requires administrator authentication
+     before Silver deletes another user's message
    ========================================================= */
 
 function canDeleteFamilyChatMessage(
@@ -2099,35 +2226,230 @@ function showToast(message) {
     }, 3000);
 }
 
+function requestFamilyChatAdminPassword() {
+
+    return new Promise(
+        resolve => {
+
+            const modal =
+                document.getElementById(
+                    "familyChatAdminModal"
+                );
+
+            const input =
+                document.getElementById(
+                    "familyChatAdminPassword"
+                );
+
+            const status =
+                document.getElementById(
+                    "familyChatAdminStatus"
+                );
+
+            const cancelButton =
+                document.getElementById(
+                    "familyChatAdminCancel"
+                );
+
+            const unlockButton =
+                document.getElementById(
+                    "familyChatAdminUnlock"
+                );
+
+            function finish(value) {
+
+                modal.style.display =
+                    "none";
+
+                modal.setAttribute(
+                    "aria-hidden",
+                    "true"
+                );
+
+                input.value = "";
+                status.textContent = "";
+
+                resolve(value);
+            }
+
+            function submit() {
+
+                const password =
+                    input.value;
+
+                if (!password) {
+                    status.textContent =
+                        "Enter the administrator password.";
+                    return;
+                }
+
+                finish(password);
+            }
+
+            cancelButton.onclick =
+                () => finish(null);
+
+            unlockButton.onclick =
+                submit;
+
+            input.onkeydown =
+                event => {
+
+                    if (event.key === "Enter") {
+                        event.preventDefault();
+                        submit();
+                    }
+
+                    if (event.key === "Escape") {
+                        finish(null);
+                    }
+
+                };
+
+            modal.style.display =
+                "flex";
+
+            modal.setAttribute(
+                "aria-hidden",
+                "false"
+            );
+
+            setTimeout(
+                () => input.focus(),
+                0
+            );
+
+        }
+    );
+
+}
+
+
+async function unlockSilverModerator() {
+
+    const password =
+        await requestFamilyChatAdminPassword();
+
+    if (password === null) {
+        return false;
+    }
+
+    const response =
+        await fetch(
+            "/moderator_unlock",
+            {
+                method: "POST",
+                headers: {
+                    "Content-Type":
+                        "application/json"
+                },
+                body: JSON.stringify({
+                    password: password
+                })
+            }
+        );
+
+    const result =
+        await response.json();
+
+    if (!response.ok) {
+        showToast(
+            result.error ||
+            "Unable to unlock moderator mode."
+        );
+        return false;
+    }
+
+    return true;
+
+}
+
+
+async function sendFamilyChatDelete(
+    index,
+    name
+) {
+
+    const response =
+        await fetch(
+            "/delete_message",
+            {
+                method: "POST",
+                headers: {
+                    "Content-Type":
+                        "application/json"
+                },
+                body: JSON.stringify({
+                    index: index,
+                    name: name
+                })
+            }
+        );
+
+    const result =
+        await response.json();
+
+    return {
+        response: response,
+        result: result
+    };
+
+}
+
+
 async function deleteMessage(index) {
-    const confirmed = true;
-    const name = localStorage.getItem("familyChatName") || "";
+
+    const name =
+        localStorage.getItem(
+            "familyChatName"
+        ) || "";
 
     try {
-        const response = await fetch("/delete_message", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify({
-                index: index,
-                name: name
-            })
-        });
 
-        const result = await response.json();
+        let attempt =
+            await sendFamilyChatDelete(
+                index,
+                name
+            );
 
-        if (!response.ok) {
-            showToast(result.error || "You can only delete your own messages.");
+        if (
+            !attempt.response.ok
+            && attempt.result
+                .requires_admin_password
+        ) {
+
+            const unlocked =
+                await unlockSilverModerator();
+
+            if (!unlocked) {
+                return;
+            }
+
+            attempt =
+                await sendFamilyChatDelete(
+                    index,
+                    name
+                );
+
+        }
+
+        if (!attempt.response.ok) {
+            showToast(
+                attempt.result.error ||
+                "Unable to delete that message."
+            );
             return;
         }
 
         location.reload();
 
-    } catch (err) {
-        console.log(err);
-        showToast("Unable to delete that message.");
+    } catch (error) {
+        console.log(error);
+        showToast(
+            "Unable to delete that message."
+        );
     }
+
 }
 </script>
 

@@ -261,6 +261,12 @@ This file contains sensitive information and should never be uploaded to GitHub.
 
 ---
 
+## FamilyChat Moderation
+
+Set the FamilyChat display name to `Silver` to reveal moderator delete controls. The first attempt to delete a message written by another user requires the existing SkyFam administrator password.
+
+Successful authentication unlocks Silver moderator access for that browser session. Closing the browser ends the moderator session. Other FamilyChat users can delete only their own messages.
+
 # YouTube Support
 
 SkyFam can optionally use the YouTube Data API for automatic livestream detection.
