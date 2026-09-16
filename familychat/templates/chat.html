@@ -2406,6 +2406,25 @@ function closeYouTube() {
 
 <script>
 
+function pauseOtherVideos(activeVideo = null) {
+
+    document.querySelectorAll(
+        "video"
+    ).forEach(
+        video => {
+
+            if (
+                video !== activeVideo &&
+                !video.paused
+            ) {
+                video.pause();
+            }
+
+        }
+    );
+
+}
+
 function openMedia(src, type) {
 
     const overlay =
@@ -2413,6 +2432,10 @@ function openMedia(src, type) {
 
     const container =
         document.getElementById("mediaContainer");
+
+    if (type === "video") {
+        pauseOtherVideos();
+    }
 
     container.innerHTML = "";
 
@@ -2564,6 +2587,10 @@ document.addEventListener(
         ) {
             return;
         }
+
+        pauseOtherVideos(
+            event.target
+        );
 
         window.parent.postMessage(
             {
