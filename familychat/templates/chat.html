@@ -2535,6 +2535,39 @@ window.addEventListener("load", () => {
         const active =
             document.activeElement;
 
+        const adminModal =
+            document.getElementById(
+                "familyChatAdminModal"
+            );
+
+        /*
+         * Never steal focus while the moderator
+         * password dialog is open.
+         */
+        if (
+            adminModal &&
+            adminModal.style.display ===
+                "flex"
+        ) {
+            return;
+        }
+
+        /*
+         * Respect anything the person is actively
+         * typing in or interacting with.
+         */
+        if (
+            active &&
+            (
+                active.matches(
+                    "input, textarea, select, button"
+                )
+                || active.isContentEditable
+            )
+        ) {
+            return;
+        }
+
         // Don't interrupt editing name field
         if (
             active &&
