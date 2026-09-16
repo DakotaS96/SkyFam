@@ -7,7 +7,7 @@ stats.html
 custom-build-config.json
 
 # compiled output
-/dist
+# Browser-ready dist is committed for SkyFam installations
 /tmp
 /out-tsc
 /local
