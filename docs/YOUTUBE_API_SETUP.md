@@ -48,6 +48,8 @@ Google occasionally changes the appearance of the Cloud Console. The wording or 
 1. Open the navigation menu on the left and select **APIs & Services**, then **Enabled APIs & services**.
 
    ![Open APIs and Services](images/youtube-api/07-apis-and-services.png)
+   
+   Click Credentials on the left
 
    ![Select Library from the API menu](images/youtube-api/08-api-menu.png)
 
@@ -59,31 +61,27 @@ Google occasionally changes the appearance of the Cloud Console. The wording or 
 
 ## Create and restrict the API key
 
-1. Under **APIs & Services**, select **Credentials**.
-
-   ![Open Credentials](images/youtube-api/08-api-menu.png)
-
-2. Click **Create credentials**, then select **API key**.
+1. Click **Create credentials**, then select **API key**.
 
    ![Create an API key](images/youtube-api/09-create-api-key.png)
 
-3. Enter a recognizable name for the key, such as `SkyFamYouTube`.
+2. Enter a recognizable name for the key, such as `SkyFamYouTube`.
 
    ![Name the API key](images/youtube-api/10-api-key-name.png)
 
-4. Under **API restrictions**, click the field that says **No APIs selected**.
+3. Under **API restrictions**, click the field that says **No APIs selected**.
 
    ![Open API restrictions](images/youtube-api/11-api-restrictions.png)
 
-5. Select **YouTube Data API v3**, then click **OK**.
+4. Select **YouTube Data API v3**, then click **OK**.
 
    ![Restrict the key to YouTube Data API v3](images/youtube-api/12-youtube-data-api-restriction.png)
 
-6. Click **Create** at the bottom of the page.
+5. Click **Create** at the bottom of the page.
 
    ![Create the restricted key](images/youtube-api/13-create-key.png)
 
-7. When Google displays the API key, click the copy icon.
+6. When Google displays the API key, click the copy icon.
 
    ![Copy the API key](images/youtube-api/14-copy-key.png)
 
