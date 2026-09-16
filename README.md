@@ -472,6 +472,13 @@ SkyFam modifications are not endorsed by the original authors unless specificall
 
 ---
 
+### Radio Browser Disclaimer
+
+SkyFam can use the public [Radio Browser](https://www.radio-browser.info/) directory to help administrators find internet radio stations.
+
+SkyFam is not affiliated with or endorsed by Radio Browser or any radio station listed through its service. Radio station names, logos, trademarks, programming, and audio streams belong to their respective owners.
+
+Radio Browser provides station information and stream addresses, but the audio is delivered by the individual station providers. SkyFam does not host, operate, control, or guarantee the availability, accuracy, content, or reliability of third-party radio streams.
 
 # Current Support
 
