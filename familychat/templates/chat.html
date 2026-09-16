@@ -2451,7 +2451,6 @@ container.innerHTML =
 <video
 src="${src}"
 controls
-autoplay
 playsinline
 webkit-playsinline
 ></video>
@@ -2460,6 +2459,38 @@ webkit-playsinline
     }
 
     overlay.style.display = "flex";
+
+    if (type === "video") {
+
+        const overlayVideo =
+            container.querySelector(
+                "video"
+            );
+
+        if (overlayVideo) {
+
+            /*
+             * Wait until the original inline click has
+             * finished, then make the overlay the only
+             * playing video.
+             */
+            requestAnimationFrame(
+                () => {
+
+                    pauseOtherVideos(
+                        overlayVideo
+                    );
+
+                    overlayVideo
+                        .play()
+                        .catch(() => {});
+
+                }
+            );
+
+        }
+
+    }
 
     // Click dark background to close
     overlay.onclick = (e) => {
