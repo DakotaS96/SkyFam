@@ -109,17 +109,17 @@ not part of the original upstream project.
 SkyFam can discover internet radio stations using the community-maintained
 Radio Browser directory.
 
-Radio Browser:  
-https://www.radio-browser.info/
+## Radio Browser
 
-SkyFam does not operate, host, or rebroadcast third-party radio stations.
+SkyFam can search for internet radio stations using the community-maintained [Radio Browser](https://www.radio-browser.info/) directory.
 
-Station availability, programming, trademarks, artwork, and streaming rights
-remain the responsibility of their respective operators.
+Radio Browser is an independent third-party service. SkyFam is not affiliated with or endorsed by Radio Browser or any station listed through its directory.
 
-SkyFam includes a small number of demonstration station entries to show how
-the radio interface works. Administrators may remove these stations and add
-their own compatible streams or discover stations through Radio Browser.
+Radio Browser provides station information and streaming addresses. Audio is delivered by the individual station operators; SkyFam does not operate, host, rebroadcast, or control these streams.
+
+Station availability, programming, stream reliability, names, trademarks, logos, artwork, and broadcasting rights remain the responsibility of their respective owners and operators. A station appearing in SkyFam does not imply endorsement by SkyFam.
+
+SkyFam includes a small number of demonstration station entries to show how the radio interface works. Administrators may remove these entries, add their own compatible streams, or discover additional stations through Radio Browser.
 
 ---
 
