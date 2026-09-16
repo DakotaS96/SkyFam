@@ -89,6 +89,8 @@ cp -a "${SCRIPT_DIR}/radio/." /opt/skyfam-radio/
 install -d /opt/dashboard/static/photos
 install -d /opt/familychat/static/uploads
 
+chmod 0755 /opt/familychat/cleanup_uploads.sh
+
 # ------------------------------------------------------------
 # Administrator password
 # ------------------------------------------------------------
@@ -214,12 +216,36 @@ RestartSec=3
 WantedBy=multi-user.target
 EOF_RADIO
 
+cat > /etc/systemd/system/skyfam-familychat-cleanup.service <<'EOF_CLEANUP_SERVICE'
+[Unit]
+Description=Remove expired SkyFam FamilyChat uploads
+
+[Service]
+Type=oneshot
+ExecStart=/opt/familychat/cleanup_uploads.sh
+EOF_CLEANUP_SERVICE
+
+cat > /etc/systemd/system/skyfam-familychat-cleanup.timer <<'EOF_CLEANUP_TIMER'
+[Unit]
+Description=Daily SkyFam FamilyChat upload cleanup
+
+[Timer]
+OnCalendar=daily
+Persistent=true
+RandomizedDelaySec=15m
+Unit=skyfam-familychat-cleanup.service
+
+[Install]
+WantedBy=timers.target
+EOF_CLEANUP_TIMER
+
 systemctl daemon-reload
 
 systemctl enable --now \
     dashboard.service \
     familychat.service \
-    skyfam-radio.service
+    skyfam-radio.service \
+    skyfam-familychat-cleanup.timer
 
 # ------------------------------------------------------------
 # Verify local services
