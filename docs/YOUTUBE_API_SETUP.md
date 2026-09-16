@@ -45,7 +45,7 @@ Google occasionally changes the appearance of the Cloud Console. The wording or 
 
 ## Enable YouTube Data API v3
 
-1. Open the navigation menu and select **APIs & Services**, then **Library**.
+1. Open the navigation menu on the left and select **APIs & Services**, then **Enabled APIs & services**.
 
    ![Open APIs and Services](images/youtube-api/07-apis-and-services.png)
 
