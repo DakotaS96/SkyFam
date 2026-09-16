@@ -724,7 +724,13 @@ button[type="submit"] {
    ========================================================= */
 
 .video-modal {
-    padding: 0 !important;
+    /*
+     * Reserve a control strip so SkyFam controls
+     * never cover the embedded YouTube player.
+     */
+    padding: 0 82px 0 0 !important;
+    box-sizing: border-box !important;
+    background: #000 !important;
 }
 
 .video-modal iframe {
@@ -742,7 +748,7 @@ button[type="submit"] {
 .youtube-close {
     position: absolute !important;
 
-    top: 8px !important;
+    top: 56px !important;
     right: 8px !important;
     left: auto !important;
 
