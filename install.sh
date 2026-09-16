@@ -65,6 +65,7 @@ apt install -y \
     python3-flask \
     python3-requests \
     python3-opencv \
+    opencv-data \
     python3-werkzeug \
     curl \
     ca-certificates
@@ -227,8 +228,6 @@ systemctl enable --now \
 echo
 echo "Checking SkyFam..."
 
-sleep 2
-
 INSTALL_OK=true
 
 for entry in \
@@ -238,11 +237,28 @@ for entry in \
 do
     name="${entry%%:*}"
     port="${entry##*:}"
+    service_ready=false
 
-    if curl -fsS "http://127.0.0.1:${port}/" >/dev/null; then
+    for attempt in $(seq 1 15); do
+        if curl -fsS \
+            --connect-timeout 1 \
+            --max-time 3 \
+            "http://127.0.0.1:${port}/" \
+            >/dev/null
+        then
+            service_ready=true
+            break
+        fi
+
+        if [[ "$attempt" -lt 15 ]]; then
+            sleep 2
+        fi
+    done
+
+    if [[ "$service_ready" == true ]]; then
         echo "  ✓ ${name} is responding on port ${port}"
     else
-        echo "  ✗ ${name} did not respond on port ${port}"
+        echo "  ✗ ${name} did not respond within 30 seconds"
         INSTALL_OK=false
     fi
 done
