@@ -1239,9 +1239,9 @@ Delete ✕
 <video
     src="{{ msg.upload_url }}"
     class="chat-media"
-    controls
     preload="metadata"
     playsinline
+    title="Open video"
 
     onclick="
         event.stopPropagation();
@@ -1558,9 +1558,9 @@ media =
 `<video
 src="${msg.upload_url}"
 class="chat-media"
-controls
 preload="metadata"
 playsinline
+title="Open video"
 onclick="
 event.preventDefault();
 event.stopPropagation();
@@ -2406,25 +2406,6 @@ function closeYouTube() {
 
 <script>
 
-function pauseOtherVideos(activeVideo = null) {
-
-    document.querySelectorAll(
-        "video"
-    ).forEach(
-        video => {
-
-            if (
-                video !== activeVideo &&
-                !video.paused
-            ) {
-                video.pause();
-            }
-
-        }
-    );
-
-}
-
 function openMedia(src, type) {
 
     const overlay =
@@ -2432,10 +2413,6 @@ function openMedia(src, type) {
 
     const container =
         document.getElementById("mediaContainer");
-
-    if (type === "video") {
-        pauseOtherVideos();
-    }
 
     container.innerHTML = "";
 
@@ -2451,6 +2428,7 @@ container.innerHTML =
 <video
 src="${src}"
 controls
+autoplay
 playsinline
 webkit-playsinline
 ></video>
@@ -2459,38 +2437,6 @@ webkit-playsinline
     }
 
     overlay.style.display = "flex";
-
-    if (type === "video") {
-
-        const overlayVideo =
-            container.querySelector(
-                "video"
-            );
-
-        if (overlayVideo) {
-
-            /*
-             * Wait until the original inline click has
-             * finished, then make the overlay the only
-             * playing video.
-             */
-            requestAnimationFrame(
-                () => {
-
-                    pauseOtherVideos(
-                        overlayVideo
-                    );
-
-                    overlayVideo
-                        .play()
-                        .catch(() => {});
-
-                }
-            );
-
-        }
-
-    }
 
     // Click dark background to close
     overlay.onclick = (e) => {
@@ -2618,10 +2564,6 @@ document.addEventListener(
         ) {
             return;
         }
-
-        pauseOtherVideos(
-            event.target
-        );
 
         window.parent.postMessage(
             {
