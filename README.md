@@ -35,6 +35,7 @@ SkyFam currently targets:
 The server can be:
 
 - A physical PC
+- Raspberry Pi (Tested Successfully on a 4) 
 - Mini PC
 - Virtual machine
 - Proxmox VM or LXC
