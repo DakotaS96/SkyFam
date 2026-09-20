@@ -198,7 +198,11 @@ body {
 @media (pointer: coarse) {
     #touchNavButton {
         display: block;
-        position: fixed;
+        /*
+         * Keep the tablet menu inside its dashboard panel,
+         * matching HearDash behavior.
+         */
+        position: absolute;
         right: 8px;
         bottom: 8px;
         width: 46px;
@@ -218,7 +222,11 @@ body {
     }
 
     #gameBar {
-        position: fixed;
+        /*
+         * Keep the launcher inside its dashboard panel instead
+         * of fixing it over FamilyChat and the message composer.
+         */
+        position: absolute;
         bottom: 62px;
         left: 50%;
         transform: translateX(-50%);
