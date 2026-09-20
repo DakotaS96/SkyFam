@@ -240,20 +240,27 @@ More detailed Raspberry Pi kiosk instructions are planned as testing continues.
 
 ---
 
-# # Administrator Features
+# Administrator Features
 
-SkyFam includes a hidden administrator interface. To open it, press and hold the **YallBot** text in the upper-left corner of the embedded YallBot YouTube player.
+SkyFam includes administrator features that are intentionally kept out of the normal dashboard interface.
 
-Current administrator features include:
+To open the main SkyFam administrator page, press and hold the **YallBot** text in the upper-left corner of the embedded YallBot YouTube player.
 
-* Internet radio controls
-* YouTube API settings
-* Manual Live Event controls
-* Change Admin Password
+The SkyFam Admin page includes:
+
+- YouTube API settings
+- Manual Live Event controls
+- Change Admin Password
+
+Internet radio settings are managed separately from the **Radio** window, but use the same SkyFam administrator password.
+
+To upload slideshow photos, press and hold the **camera icon** on the SkyFam dashboard.
+
+For instructions on using these features, see the [SkyFam User Guide](docs/USER_GUIDE.md).
 
 During installation, SkyFam asks the administrator to create and confirm a password. Fresh installations do not use a default administrator password.
 
-This password controls SkyFam’s administrator features. It is separate from the Debian/Linux root password and does not provide access to the Linux root account.
+This password controls SkyFam's administrator features. It is separate from the Debian/Linux root password and does not provide access to the Linux root account.
 
 Changing the SkyFam administrator password does **not** change the Linux root password.
 
