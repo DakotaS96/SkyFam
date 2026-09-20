@@ -18,11 +18,13 @@ SkyFam is not affiliated with or endorsed by Ryan Hall, YouTube, or any third-pa
 
 SkyFam is free and open-source, and I intend to keep it that way.
 
-If you enjoy the project and would like to support its continued development, you can make an optional contribution—but please do not feel obligated. Simply using or sharing SkyFam is support enough.
+If SkyFam has been useful to you and you'd like to support the time and costs behind the project, you can do so through GitHub Sponsors. Support is completely optional, and simply using, sharing, or contributing feedback to SkyFam is already appreciated.
 
-I work on SkyFam in my spare time, so I cannot promise individual technical support or specific timelines. Bug reports and suggestions are welcome through GitHub Issues, and I will review them when I can.
+I work on SkyFam in my spare time, so sponsorship is not a paid support contract and does not guarantee individual technical support, specific features, or development timelines. Bug reports and suggestions are always welcome through GitHub Issues, and I’ll review them when I can.
 
 If you choose to contribute, think of it less as buying me a coffee and more as buying me an energy drink for the next round of development.
+
+[Support SkyFam on GitHub Sponsors](https://github.com/sponsors/DakotaS96)
 
 ---
 
