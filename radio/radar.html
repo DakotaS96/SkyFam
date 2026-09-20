@@ -1322,7 +1322,7 @@ function cleanLocationName(name) {
     return String(name)
         .trim()
         .replace(
-            /,\\s*([A-Z]{2})\\s+\\d{5}\\s*$/,
+            /,\s*([A-Z]{2})\s+\d{5}\s*$/,
             ", $1"
         )
         .trim();
@@ -2147,10 +2147,12 @@ if (
             );
 
 
+        /*
+         * The saved ZIP location is remembered, but the
+         * entry field should remain blank after reload.
+         */
         zipInput.value =
-            localStorage.getItem(
-                "skyfamRadarZip"
-            ) || "";
+            "";
 
     }
 
