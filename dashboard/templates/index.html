@@ -389,9 +389,10 @@ body {
  */
 @media (hover: none), (pointer: coarse) {
     #gameBar {
-        opacity: 1 !important;
-        pointer-events: auto !important;
-
+        /*
+         * Keep the launcher hidden until the tablet menu button
+         * is tapped, matching HearDash behavior.
+         */
         bottom: max(10px, env(safe-area-inset-bottom));
 
         max-width: calc(100vw - 20px);
