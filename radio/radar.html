@@ -1262,6 +1262,61 @@ let customLocation =
 const userLocationsStorageKey =
     "skyfamRadarUserLocations";
 
+
+function sortLocationOptions() {
+
+    const options =
+        Array.from(
+            locationSelect.options
+        );
+
+    options.sort(
+        (first, second) => {
+
+            const firstState =
+                first.value.match(
+                    /^([A-Z]{2})-/
+                )?.[1] ||
+                first.textContent.match(
+                    /,\s*([A-Z]{2})(?:\s|$)/
+                )?.[1] ||
+                "ZZ";
+
+            const secondState =
+                second.value.match(
+                    /^([A-Z]{2})-/
+                )?.[1] ||
+                second.textContent.match(
+                    /,\s*([A-Z]{2})(?:\s|$)/
+                )?.[1] ||
+                "ZZ";
+
+            const firstName =
+                first.textContent.trim();
+
+            const secondName =
+                second.textContent.trim();
+
+            return (
+                firstState +
+                "-" +
+                firstName
+            ).localeCompare(
+                secondState +
+                "-" +
+                secondName
+            );
+        }
+    );
+
+    options.forEach(
+        option =>
+            locationSelect.appendChild(
+                option
+            )
+    );
+}
+
 function addLocationOption(location) {
 
     if (
@@ -1304,6 +1359,8 @@ function addLocationOption(location) {
 
     option.dataset.lon =
         String(location.lon);
+
+    sortLocationOptions();
 }
 
 function rememberLocationOption(location) {
@@ -1342,6 +1399,8 @@ function rememberLocationOption(location) {
         JSON.stringify(saved)
     );
 }
+
+sortLocationOptions();
 
 function loadRememberedLocationOptions() {
 
