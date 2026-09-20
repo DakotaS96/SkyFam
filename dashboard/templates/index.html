@@ -548,6 +548,76 @@ body {
 }
 
 
+
+/* Final tablet launcher layout */
+#slideshow {
+    position: relative;
+}
+
+#gameBar {
+    display: flex !important;
+    flex-wrap: nowrap !important;
+    white-space: nowrap !important;
+    overflow-x: auto;
+    max-width: calc(100% - 20px);
+    box-sizing: border-box;
+}
+
+#gameBar button {
+    flex: 0 0 auto;
+}
+
+#touchNavButton {
+    display: none;
+}
+
+@media (pointer: coarse), (max-width: 900px) {
+    #touchNavButton {
+        display: block;
+        position: absolute;
+        right: 10px;
+        bottom: 10px;
+        z-index: 100001;
+
+        width: 44px;
+        height: 44px;
+        padding: 0;
+
+        border: none;
+        border-radius: 8px;
+        background: rgba(20, 20, 20, 0.9);
+        color: white;
+        font-size: 24px;
+        line-height: 44px;
+        text-align: center;
+        cursor: pointer;
+        touch-action: manipulation;
+    }
+
+    #gameBar {
+        position: absolute !important;
+        left: 50% !important;
+        right: auto !important;
+        bottom: 10px !important;
+        transform: translateX(-50%) !important;
+
+        width: max-content;
+        max-width: calc(100% - 70px);
+        overflow-x: auto;
+        z-index: 100000;
+    }
+
+    #gameBar:not(.visible) {
+        opacity: 0 !important;
+        pointer-events: none !important;
+    }
+
+    #gameBar.visible {
+        opacity: 1 !important;
+        pointer-events: auto !important;
+    }
+}
+
 </style>
 </head>
 
@@ -557,6 +627,13 @@ body {
 
 <!-- 1: Photos -->
 <div class="panel" id="slideshow">
+
+    <button id="touchNavButton"
+            type="button"
+            aria-label="Show navigation"
+            title="Show navigation">
+        ☰
+    </button>
 
     <div id="gameBar">
 
@@ -2089,6 +2166,80 @@ if (touchNavigation) {
         }
     );
 }
+
+let gameBarTimer;
+
+const gameBar =
+    document.getElementById("gameBar");
+
+const touchNavButton =
+    document.getElementById("touchNavButton");
+
+function showTouchNavigation() {
+    if (!gameBar) {
+        return;
+    }
+
+    gameBar.classList.add("visible");
+
+    clearTimeout(gameBarTimer);
+
+    gameBarTimer = setTimeout(
+        () => {
+            gameBar.classList.remove("visible");
+        },
+        5000
+    );
+}
+
+if (touchNavButton) {
+    touchNavButton.addEventListener(
+        "click",
+        (event) => {
+            event.preventDefault();
+            event.stopPropagation();
+            showTouchNavigation();
+        }
+    );
+}
+
+document.addEventListener(
+    "mousemove",
+    () => {
+        if (!gameBar) {
+            return;
+        }
+
+        gameBar.classList.add("visible");
+        clearTimeout(gameBarTimer);
+
+        gameBarTimer = setTimeout(
+            () => {
+                gameBar.classList.remove("visible");
+            },
+            3000
+        );
+    }
+);
+
+document.addEventListener(
+    "mouseleave",
+    () => {
+        if (!gameBar) {
+            return;
+        }
+
+        gameBar.classList.add("visible");
+        clearTimeout(gameBarTimer);
+
+        gameBarTimer = setTimeout(
+            () => {
+                gameBar.classList.remove("visible");
+            },
+            3000
+        );
+    }
+);
 
 const YALLBOT_URL =
     "https://www.youtube.com/embed/rqHW2HhgGQ0?enablejsapi=1&autoplay=0&controls=0&modestbranding=1&rel=0";
