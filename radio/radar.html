@@ -1328,6 +1328,18 @@ function cleanLocationName(name) {
         .trim();
 }
 
+
+function displayRadarLocationName(name) {
+
+    return String(name)
+        .trim()
+        .replace(
+            /,\s*([A-Z]{2})\s+\d{5}\s*$/,
+            ", $1"
+        )
+        .trim();
+}
+
 function addLocationOption(location) {
 
     if (
@@ -1362,8 +1374,7 @@ function addLocationOption(location) {
         );
     }
 
-    option.textContent =
-        location.name;
+    option.textContent = displayRadarLocationName(location.name);
 
     option.dataset.lat =
         String(location.lat);
@@ -1809,6 +1820,11 @@ async function setZipLocation() {
                 )
 
         };
+
+        customLocation.name =
+            displayRadarLocationName(
+                customLocation.name
+            );
 
         rememberLocationOption(
             customLocation
