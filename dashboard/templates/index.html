@@ -628,13 +628,6 @@ body {
 <!-- 1: Photos -->
 <div class="panel" id="slideshow">
 
-    <button id="touchNavButton"
-            type="button"
-            aria-label="Show navigation"
-            title="Show navigation">
-        ☰
-    </button>
-
     <div id="gameBar">
 
         <button id="photoButton" onclick="showPhotos()">
@@ -2098,7 +2091,9 @@ if (touchNavigation) {
         "Show navigation"
     );
 
-    document.body.appendChild(
+    document.getElementById(
+        "slideshow"
+    ).appendChild(
         touchNavButton
     );
 
@@ -2166,80 +2161,6 @@ if (touchNavigation) {
         }
     );
 }
-
-let gameBarTimer;
-
-const gameBar =
-    document.getElementById("gameBar");
-
-const touchNavButton =
-    document.getElementById("touchNavButton");
-
-function showTouchNavigation() {
-    if (!gameBar) {
-        return;
-    }
-
-    gameBar.classList.add("visible");
-
-    clearTimeout(gameBarTimer);
-
-    gameBarTimer = setTimeout(
-        () => {
-            gameBar.classList.remove("visible");
-        },
-        5000
-    );
-}
-
-if (touchNavButton) {
-    touchNavButton.addEventListener(
-        "click",
-        (event) => {
-            event.preventDefault();
-            event.stopPropagation();
-            showTouchNavigation();
-        }
-    );
-}
-
-document.addEventListener(
-    "mousemove",
-    () => {
-        if (!gameBar) {
-            return;
-        }
-
-        gameBar.classList.add("visible");
-        clearTimeout(gameBarTimer);
-
-        gameBarTimer = setTimeout(
-            () => {
-                gameBar.classList.remove("visible");
-            },
-            3000
-        );
-    }
-);
-
-document.addEventListener(
-    "mouseleave",
-    () => {
-        if (!gameBar) {
-            return;
-        }
-
-        gameBar.classList.add("visible");
-        clearTimeout(gameBarTimer);
-
-        gameBarTimer = setTimeout(
-            () => {
-                gameBar.classList.remove("visible");
-            },
-            3000
-        );
-    }
-);
 
 const YALLBOT_URL =
     "https://www.youtube.com/embed/rqHW2HhgGQ0?enablejsapi=1&autoplay=0&controls=0&modestbranding=1&rel=0";
