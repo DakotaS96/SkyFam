@@ -746,6 +746,13 @@ button.active {
                 Set
             </button>
 
+            <button
+                type="button"
+                id="reloadRadarButton"
+                title="Reload radar">
+                Reload
+            </button>
+
         </div>
 
 
@@ -924,6 +931,20 @@ const zipButton =
         "zipButton"
     );
 
+const reloadRadarButton =
+    document.getElementById(
+        "reloadRadarButton"
+    );
+
+
+if (reloadRadarButton) {
+    reloadRadarButton.addEventListener(
+        "click",
+        () => {
+            window.location.reload();
+        }
+    );
+}
 
 const localButton =
     document.getElementById(
