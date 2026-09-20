@@ -14,6 +14,11 @@ It combines several family-oriented features into one place:
 - Photo slideshow
 - Optional HTTPS access
 
+## Documentation
+
+- [User Guide](docs/USER_GUIDE.md) — everyday use, hidden controls, photo management, and Live Events
+- [YouTube API Setup](docs/YOUTUBE_API_SETUP.md) — configure YouTube API access
+
 ![SkyFam dashboard](SkyFam3.png)
 
 > **Project Status**
