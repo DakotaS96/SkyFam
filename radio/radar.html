@@ -1317,6 +1317,17 @@ function sortLocationOptions() {
     );
 }
 
+function cleanLocationName(name) {
+
+    return String(name)
+        .trim()
+        .replace(
+            /,\\s*([A-Z]{2})\\s+\\d{5}\\s*$/,
+            ", $1"
+        )
+        .trim();
+}
+
 function addLocationOption(location) {
 
     if (
@@ -2034,6 +2045,72 @@ window.addEventListener(
 
 
 loadRememberedLocationOptions();
+normalizeSavedLocationLabels();
+
+
+function normalizeSavedLocationLabels() {
+
+    Array.from(
+        locationSelect.options
+    ).forEach(
+        option => {
+            option.textContent =
+                cleanLocationName(
+                    option.textContent
+                );
+        }
+    );
+
+    try {
+        const saved =
+            JSON.parse(
+                localStorage.getItem(
+                    userLocationsStorageKey
+                ) || "[]"
+            );
+
+        saved.forEach(
+            location => {
+                location.name =
+                    cleanLocationName(
+                        location.name
+                    );
+            }
+        );
+
+        localStorage.setItem(
+            userLocationsStorageKey,
+            JSON.stringify(saved)
+        );
+
+        const savedCustom =
+            localStorage.getItem(
+                "skyfamRadarCustomLocation"
+            );
+
+        if (savedCustom) {
+            const custom =
+                JSON.parse(savedCustom);
+
+            custom.name =
+                cleanLocationName(
+                    custom.name
+                );
+
+            localStorage.setItem(
+                "skyfamRadarCustomLocation",
+                JSON.stringify(custom)
+            );
+        }
+    } catch (error) {
+        console.warn(
+            "Radar location cleanup failed",
+            error
+        );
+    }
+
+    sortLocationOptions();
+}
 
 
 const savedCustomLocation =
