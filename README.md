@@ -33,27 +33,29 @@ It combines several family-oriented features into one place:
 
 ## SkyFam Server
 
-SkyFam currently targets:
+SkyFam currently targets **Debian 13 (Trixie)**.
 
-**Debian 13 (Trixie)**
+It can run on a variety of hardware and virtualized environments, including:
 
-The server can be:
+- Physical PCs and mini PCs
+- Raspberry Pi systems
+- Virtual machines
+- Proxmox VMs or LXCs
+- Other Debian 13 systems
 
-- A physical PC
-- Raspberry Pi (Tested Successfully on a 4) 
-- Mini PC
-- Virtual machine
-- Proxmox VM or LXC
-- Another Debian 13 system
+SkyFam has been successfully tested on:
+- **Raspberry Pi 4**
+- **Raspberry Pi 3B+**
+- **Proxmox LXC container**
+
+### Requirements
 
 You will need:
 
 - Internet access during installation
-- A user with `sudo` or root access
-- A network connection
-- Enough disk space for your family's photos, chat uploads, and videos
-
-You do **not** need to know Python, Flask, systemd, or GitHub to install SkyFam.
+- Root access or a user with `sudo`
+- Network access for devices that will connect to SkyFam
+- Enough storage for photos, FamilyChat uploads, and videos
 
 ## Storage
 
