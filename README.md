@@ -325,6 +325,10 @@ This can be useful for:
 
 SkyFam includes a photo slideshow and FamilyChat.
 
+To upload photos to the slideshow, **press and hold the Camera button** on the SkyFam dashboard. This opens the photo upload window.
+
+A normal click or tap on the Camera button opens the regular Photos view.
+
 FamilyChat supports uploaded media such as photos and videos.
 
 Because media can become much larger than the SkyFam application itself, available storage should be monitored on systems that receive a lot of uploads.
