@@ -142,42 +142,33 @@ Run:
 sudo bash install.sh
 ```
 
-The installer handles most of the setup automatically.
+The installer will:
 
-It will:
-
-- Verify that the server is running Debian 13
-- Install required Debian packages
+- Verify Debian 13
+- Install required packages
 - Install SkyFam under `/opt`
-- Create the Dashboard service
-- Create the FamilyChat service
-- Create the SkyFam Radio service
-- Configure automatic cleanup of older FamilyChat uploads
+- Create and start the SkyFam services
+- Configure automatic cleanup for older FamilyChat uploads
 - Ask you to create a SkyFam administrator password
 - Optionally configure a YouTube Data API key
-- Configure SkyFam services to start automatically after reboot
-- Start the SkyFam services
 - Verify that Dashboard, FamilyChat, and Radio are responding
-- Ask how you want to access SkyFam
 
-Access Options
+### Access Options
 
-During installation, you will be given three choices:
+During installation, choose one of the following:
 
-Local network only
-Keeps SkyFam available only to devices on your home or local network. This is the safest default.
-Tailscale private remote access
-Recommended for most families who want to access SkyFam while away from home. The installer can install Tailscale and guide you through connecting the server to your private Tailscale network.
-Existing protected remote access
-Intended for advanced users who already have authenticated remote access configured, such as Cloudflare Tunnel protected by Cloudflare Access and MFA, an authenticated reverse proxy, or a private VPN.
+1. **Local network only**  
+   Best if SkyFam will only be used at home.
 
-SkyFam may contain private family messages, photos, and videos.
+2. **Tailscale private remote access**  
+   Recommended if family members need access while away from home.
 
-**Do not directly forward ports `5000`, `5050`, or `5080` through your router.**
+3. **Existing protected remote access**  
+   For advanced users who already use something such as Cloudflare Access, an authenticated reverse proxy, or a private VPN.
 
-HTTPS by itself does not make SkyFam private.
+> **Security:** SkyFam may contain private family messages, photos, and videos. Do not directly forward ports `5000`, `5050`, or `5080` through your router. HTTPS alone does not make SkyFam private.
 
-See the [Remote Access](#remote-access) section for more information.
+See [Remote Access](#remote-access) for more information.
 
 ## 4. Open SkyFam
 
