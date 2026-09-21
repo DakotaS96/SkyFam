@@ -187,17 +187,22 @@ The main Dashboard normally uses:
 
 ```text
 http://SERVER-IP:5000
+```
 
 For example:
 
+```text
 http://192.168.1.50:5000
+```
 
 Open that address from another computer, tablet, Raspberry Pi, kiosk device, or other web browser on the same network.
 
 SkyFam also runs:
 
+```text
 FamilyChat: http://SERVER-IP:5050
 Radio:      http://SERVER-IP:5080
+```
 
 Normally you will use the main Dashboard and access FamilyChat and Radio from there.
 
@@ -209,23 +214,21 @@ That's it — SkyFam should now be running.
 
 # Updating SkyFam
 
-If you installed SkyFam through GitHub, updates can be downloaded with Git.
+SkyFam is still under active development, so check the project notes before applying major updates.
 
-Go to the folder where you originally downloaded SkyFam:
+If you installed SkyFam from GitHub, first go to the folder where you originally cloned the project:
 
 ```bash
 cd SkyFam
 ```
 
-Then run:
+Download the latest repository changes:
 
 ```bash
 git pull
 ```
 
-Because SkyFam is still being developed, check the project notes before applying major updates.
-
-Some updates may require restarting services or rerunning part of the installer.
+Some updates may require restarting services.
 
 ---
 
