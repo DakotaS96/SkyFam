@@ -106,11 +106,6 @@ not part of the original upstream project.
 
 ## Radio Browser
 
-SkyFam can discover internet radio stations using the community-maintained
-Radio Browser directory.
-
-## Radio Browser
-
 SkyFam can search for internet radio stations using the community-maintained [Radio Browser](https://www.radio-browser.info/) directory.
 
 Radio Browser is an independent third-party service. SkyFam is not affiliated with or endorsed by Radio Browser or any station listed through its directory.
