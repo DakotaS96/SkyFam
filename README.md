@@ -105,11 +105,13 @@ Older Raspberry Pi models may work better with a lightweight browser or kiosk re
 
 # Quick Install
 
-These instructions are intended for people who may not have much GitHub or Linux experience.
+These instructions are written for users who may have little or no experience with Linux or GitHub.
+
+SkyFam currently supports **Debian 13 (Trixie)**.
 
 ## 1. Install Git
 
-Log into your Debian 13 server and run:
+Log into your Debian 13 SkyFam server and run:
 
 ```bash
 sudo apt update
@@ -144,45 +146,64 @@ The installer handles most of the setup automatically.
 
 It will:
 
+- Verify that the server is running Debian 13
 - Install required Debian packages
 - Install SkyFam under `/opt`
 - Create the Dashboard service
 - Create the FamilyChat service
 - Create the SkyFam Radio service
+- Configure automatic cleanup of older FamilyChat uploads
 - Ask you to create a SkyFam administrator password
 - Optionally configure a YouTube Data API key
-- Configure SkyFam to start automatically after reboot
-- Start the services
-- Test that the services are responding
+- Configure SkyFam services to start automatically after reboot
+- Start the SkyFam services
+- Verify that Dashboard, FamilyChat, and Radio are responding
 - Ask how you want to access SkyFam
 
-You will be given three networking choices:
+Access Options
 
-1. Automatic HTTPS setup using Caddy
-2. Use your own reverse proxy
-3. Local-network-only access
+During installation, you will be given three choices:
 
-If you are just getting started, **LAN access only is perfectly fine**.
+Local network only
+Keeps SkyFam available only to devices on your home or local network. This is the safest default.
+Tailscale private remote access
+Recommended for most families who want to access SkyFam while away from home. The installer can install Tailscale and guide you through connecting the server to your private Tailscale network.
+Existing protected remote access
+Intended for advanced users who already have authenticated remote access configured, such as Cloudflare Tunnel protected by Cloudflare Access and MFA, an authenticated reverse proxy, or a private VPN.
+
+SkyFam may contain private family messages, photos, and videos.
+
+**Do not directly forward ports `5000`, `5050`, or `5080` through your router.**
+
+HTTPS by itself does not make SkyFam private.
+
+See the [Remote Access](#remote-access) section for more information.
 
 ## 4. Open SkyFam
 
-At the end of installation, SkyFam displays the local addresses you can use.
+At the end of installation, SkyFam displays the local addresses for its services.
 
-The main dashboard will normally look like:
+The main Dashboard normally uses:
 
 ```text
 http://SERVER-IP:5000
-```
 
 For example:
 
-```text
 http://192.168.1.50:5000
-```
 
-Open that address from another computer, tablet, Raspberry Pi, or kiosk device on the same network.
+Open that address from another computer, tablet, Raspberry Pi, kiosk device, or other web browser on the same network.
 
-That's it. SkyFam should now be running.
+SkyFam also runs:
+
+FamilyChat: http://SERVER-IP:5050
+Radio:      http://SERVER-IP:5080
+
+Normally you will use the main Dashboard and access FamilyChat and Radio from there.
+
+If you configured Tailscale during installation, the installer will also display the private Tailscale addresses you can use from approved remote devices.
+
+That's it — SkyFam should now be running.
 
 ---
 
