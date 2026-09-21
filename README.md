@@ -410,7 +410,7 @@ SkyFam can be accessed remotely in two main ways:
 
 ## Recommended: Tailscale
 
-For most families, **Tailscale is the recommended remote-access method**.
+For most families, **[Tailscale](https://tailscale.com/)** is the recommended remote-access method.
 
 Tailscale creates a private network between your approved devices. This allows phones, tablets, laptops, and other devices to reach the SkyFam server while away from home without exposing SkyFam directly to the public internet.
 
