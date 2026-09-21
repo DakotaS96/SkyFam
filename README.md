@@ -397,6 +397,33 @@ This is the easiest setup for initial testing.
 
 ---
 
+# Remote Access
+
+SkyFam can be accessed remotely in two main ways:
+
+1. **Private remote access with Tailscale**
+2. **Public HTTPS access using a domain name and reverse proxy**
+
+## Recommended: Tailscale
+
+For most families, **Tailscale is the recommended remote-access method**.
+
+Tailscale creates a private network between your approved devices. This allows phones, tablets, laptops, and other devices to reach the SkyFam server while away from home without exposing SkyFam directly to the public internet.
+
+This is a good choice if:
+
+- SkyFam is intended mainly for your family
+- You do not need completely public access
+- You are comfortable installing Tailscale on the devices that need remote access
+- You want a simpler security model
+
+Once Tailscale is installed on the SkyFam server and your remote device, you can access SkyFam using the server's Tailscale IP address or MagicDNS hostname.
+
+Example:
+
+```text
+http://skyfam-server:5000
+
 # HTTPS and Reverse Proxies
 
 SkyFam can optionally use HTTPS addresses such as:
