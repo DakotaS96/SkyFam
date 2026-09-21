@@ -43,7 +43,7 @@ It can run on a variety of hardware and virtualized environments, including:
 - Proxmox VMs or LXCs
 - Other Debian 13 systems
 
-SkyFam has been successfully tested on:
+SkyFam has been successfully tested on the following server platforms:
 - **Raspberry Pi 4**
 - **Raspberry Pi 3B+**
 - **Proxmox LXC container**
