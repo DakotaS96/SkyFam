@@ -50,3 +50,7 @@ dashboard/static/live_channel.json
 dashboard/games/bubbleshooter-static/
 dashboard/games/solitaire/js/yui-unpack/yui/docs/
 dashboard/games/solitaire/js/yui-unpack/yui/tests/
+
+# User-uploaded photos and generated HEIC previews
+# Already tracked placeholder assets remain tracked.
+dashboard/static/photos/*

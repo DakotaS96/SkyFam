@@ -66,6 +66,8 @@ apt install -y \
     python3-requests \
     python3-opencv \
     opencv-data \
+    libheif-examples \
+    libimage-exiftool-perl \
     python3-werkzeug \
     curl \
     ca-certificates

@@ -176,6 +176,8 @@ def test_youtube_key(api_key):
     return False, message
 
 
+from heic_support import ensure_heic_preview
+
 PHOTO_DIR = "/opt/dashboard/static/photos"
 
 FACE_CACHE_FILE = "/opt/dashboard/face_positions.json"
@@ -343,43 +345,51 @@ def index():
     }
 
     all_photo_filenames = [
-        p
-        for p in photos
-        if p.lower().endswith(
-            (
-                '.jpg',
-                '.jpeg',
-                '.png',
-                '.svg',
-                '.webp',
-                '.gif'
-            )
-        )
+        p for p in photos
+        if os.path.isfile(os.path.join(PHOTO_DIR, p))
+        and p.lower().endswith((
+            ".jpg", ".jpeg", ".png", ".svg",
+            ".webp", ".gif", ".heic", ".heif"
+        ))
     ]
 
-    real_photos = [
-        p
-        for p in all_photo_filenames
-        if p not in placeholder_files
-    ]
+    real_photos = []
+    for filename in all_photo_filenames:
+        if filename in placeholder_files:
+            continue
+
+        if filename.lower().endswith((".heic", ".heif")):
+            try:
+                real_photos.append(ensure_heic_preview(filename))
+            except Exception:
+                app.logger.exception(
+                    "HEIC conversion failed: %s", filename
+                )
+        else:
+            real_photos.append(filename)
 
     if real_photos:
         photo_filenames = real_photos
     else:
         photo_filenames = [
-            p
-            for p in all_photo_filenames
+            p for p in all_photo_filenames
             if p in placeholder_files
         ]
 
+    face_positions_base = get_face_positions(photo_filenames)
+
     photos = [
-        f"/static/photos/{p}"
+        f"/static/photos/{p}?v="
+        f"{os.stat(os.path.join(PHOTO_DIR, p)).st_mtime_ns}"
         for p in photo_filenames
     ]
 
-    face_positions = get_face_positions(
-        photo_filenames
-    )
+    face_positions = {
+        url: face_positions_base.get(
+            url.split("?")[0], "center top"
+        )
+        for url in photos
+    }
 
     return render_template(
         "index.html",
@@ -412,11 +422,8 @@ def upload_photo():
         }), 400
 
     allowed = (
-        ".jpg",
-        ".jpeg",
-        ".png",
-        ".webp",
-        ".gif"
+        ".jpg", ".jpeg", ".png", ".webp",
+        ".gif", ".heic", ".heif"
     )
 
     if not file.filename.lower().endswith(
@@ -432,23 +439,35 @@ def upload_photo():
     )
 
     file.save(
-        os.path.join(
-            PHOTO_DIR,
-            filename
-        )
+        os.path.join(PHOTO_DIR, filename)
     )
 
-    # Analyze the newly uploaded photo immediately so
-    # the dashboard never has to wait for a later page load.
+    preview_filename = filename
+    if filename.lower().endswith((".heic", ".heif")):
+        try:
+            preview_filename = ensure_heic_preview(filename)
+        except Exception:
+            app.logger.exception(
+                "Uploaded HEIC conversion failed: %s", filename
+            )
+            return jsonify({
+                "success": False,
+                "error": "HEIC saved, but JPEG conversion failed"
+            }), 500
+
     face_position = detect_portrait_face_position(
-        filename
+        preview_filename
     )
 
     cache = load_face_cache()
-    cache[filename] = face_position
+    cache[preview_filename] = face_position
     save_face_cache(cache)
 
-    photo_url = f"/static/photos/{filename}"
+    version = os.stat(
+        os.path.join(PHOTO_DIR, preview_filename)
+    ).st_mtime_ns
+
+    photo_url = f"/static/photos/{preview_filename}?v={version}"
 
     return jsonify({
         "success": True,
